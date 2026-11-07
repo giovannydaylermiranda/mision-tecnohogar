@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Misión TecnoHogar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: una sola columna centrada, vistas por #hash (inicio, tarjeta, semaforo, boleto, docente) */
+:root{
+  --bg:#f3f5f9; --surface:#ffffff; --ink:#14213d; --muted:#5b6b86; --line:#d7deea;
+  --cliente:#1d4ed8; --cliente-soft:#dbe6ff; --pedido:#c2410c; --pedido-soft:#ffe6d5;
+  --verde:#15803d; --amarillo:#eab308; --rojo:#dc2626; --null:#7f1d1d;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0e1424; --surface:#172036; --ink:#e8edf7; --muted:#9aa8c3; --line:#2a3654;
+    --cliente:#6f9bff; --cliente-soft:#1c2c55; --pedido:#ff8a4c; --pedido-soft:#4a2414; color-scheme: dark; }
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px));
+  padding-block:max(12px, env(safe-area-inset-top,0px)) max(24px, env(safe-area-inset-bottom,0px));}
+.wrap{max-width:980px; margin:0 auto; display:flex; flex-direction:column; gap:18px}
+header.top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.brand{font-family:var(--display); font-weight:800; font-size:1.35rem; letter-spacing:.2px; text-decoration:none; color:var(--ink)}
+.brand span{color:var(--pedido)}
+.estado{font-size:.82rem; padding:4px 10px; border-radius:999px; border:1px solid var(--line); color:var(--muted); background:var(--surface)}
+.estado.vivo{color:var(--verde); border-color:var(--verde)}
+h1,h2{font-family:var(--display); font-weight:800; line-height:1.1; text-wrap:balance; margin:0}
+h1{font-size:clamp(1.8rem,5vw,2.6rem)}
+h2{font-size:1.4rem}
+p{margin:0}
+.muted{color:var(--muted)}
+.grid3{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px}
+.opcion{display:flex; flex-direction:column; gap:6px; padding:20px; border-radius:16px; background:var(--surface); border:1px solid var(--line);
+  text-decoration:none; color:var(--ink); min-height:150px}
+.opcion:hover,.opcion:focus-visible{border-color:var(--cliente); outline:none}
+.opcion .ico{font-size:2rem}
+.opcion b{font-family:var(--display); font-size:1.25rem}
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:14px}
+label{font-weight:700}
+input[type=number],input[type=text],textarea{font:inherit; font-size:1.1rem; width:100%; padding:12px 14px; border-radius:12px; border:2px solid var(--line);
+  background:var(--bg); color:var(--ink)}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--cliente); outline-offset:2px}
+textarea{min-height:90px; resize:vertical}
+.btn{font:inherit; font-weight:700; font-size:1.05rem; padding:14px 18px; border-radius:12px; border:0; cursor:pointer; background:var(--ink); color:var(--surface)}
+.btn.sec{background:transparent; color:var(--ink); border:2px solid var(--line)}
+.btn.peligro{background:var(--rojo); color:#fff}
+.fila{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.volver{font-size:.95rem; color:var(--muted); text-decoration:none}
+/* Tarjeta */
+.tarjeta{border-radius:22px; padding:26px 22px; display:flex; flex-direction:column; gap:12px; border:4px solid}
+.tarjeta.cliente{background:var(--cliente-soft); border-color:var(--cliente)}
+.tarjeta.pedido{background:var(--pedido-soft); border-color:var(--pedido)}
+.tarjeta .tipo{font-family:var(--display); font-weight:800; letter-spacing:3px; font-size:1rem}
+.tarjeta.cliente .tipo{color:var(--cliente)} .tarjeta.pedido .tipo{color:var(--pedido)}
+.tarjeta .clave{font-family:var(--mono); font-weight:700; font-size:clamp(2.6rem,12vw,4.2rem); line-height:1}
+.tarjeta .nombre{font-family:var(--display); font-size:1.6rem; font-weight:600}
+.tarjeta .fk{font-family:var(--mono); font-size:1.3rem; font-weight:700; background:var(--surface); border-radius:10px; padding:8px 12px; align-self:flex-start}
+.tarjeta.esnull{background:var(--null); border-color:var(--rojo); color:#fff}
+.tarjeta.esnull .tipo,.tarjeta.esnull .clave,.tarjeta.esnull .nombre{color:#fff}
+#miTarjeta{display:flex; flex-direction:column; gap:14px}
+.nullsello{font-family:var(--mono); font-size:3rem; font-weight:700; color:#fff; text-align:center}
+/* Semáforo */
+.grupos{display:grid; grid-template-columns:repeat(auto-fit,minmax(70px,1fr)); gap:10px}
+.grupos button{font:inherit; font-family:var(--display); font-weight:800; font-size:1.5rem; padding:18px 0; border-radius:12px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer}
+.grupos button[aria-pressed=true]{background:var(--ink); color:var(--surface); border-color:var(--ink)}
+.luces{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.luz{font:inherit; font-weight:700; color:#fff; border:0; border-radius:16px; padding:22px 6px; cursor:pointer; font-size:1rem}
+.luz.verde{background:var(--verde)} .luz.amarillo{background:var(--amarillo); color:#1a1a1a} .luz.rojo{background:var(--rojo)}
+.pantalla{position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; z-index:20; text-align:center;
+  padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));}
+.pantalla.verde{background:var(--verde); color:#fff} .pantalla.amarillo{background:var(--amarillo); color:#1a1a1a} .pantalla.rojo{background:var(--rojo); color:#fff}
+.pantalla .g{font-family:var(--display); font-weight:800; font-size:clamp(3rem,16vw,7rem); line-height:1}
+.pantalla .m{font-family:var(--display); font-weight:800; font-size:clamp(1.6rem,7vw,3rem)}
+.pantalla .btn{background:rgba(0,0,0,.25); color:inherit}
+/* Docente */
+.tabs{display:flex; gap:8px; flex-wrap:wrap}
+.tabs button{font:inherit; font-weight:700; padding:10px 14px; border-radius:10px; border:2px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--ink); color:var(--surface); border-color:var(--ink)}
+.tablero{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px}
+.mesa{border-radius:16px; padding:18px 12px; text-align:center; color:#fff; background:#64748b; display:flex; flex-direction:column; gap:4px}
+.mesa.verde{background:var(--verde)} .mesa.amarillo{background:var(--amarillo); color:#1a1a1a} .mesa.rojo{background:var(--rojo)}
+.mesa b{font-family:var(--display); font-size:2.2rem; line-height:1}
+.mesa small{font-size:.85rem; opacity:.9}
+.cifras{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px}
+.cifra{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:14px}
+.cifra b{display:block; font-family:var(--mono); font-size:2rem}
+.lista{display:flex; flex-direction:column; gap:10px}
+.boleto{background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:grid; gap:4px}
+.boleto .q{font-size:.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted)}
+.tabla{overflow-x:auto}
+table{border-collapse:collapse; width:100%; font-size:.95rem; font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line); padding:6px 8px; text-align:left}
+th{background:var(--bg)}
+.chip{display:inline-block; padding:2px 8px; border-radius:999px; font-size:.8rem; font-weight:700; color:#fff}
+.chip.c{background:var(--cliente)} .chip.p{background:var(--pedido)} .chip.n{background:var(--rojo)}
+#qr{background:#fff; padding:16px; border-radius:12px; align-self:center}
+#qr img,#qr canvas{display:block}
+.url{font-family:var(--mono); font-size:1rem; word-break:break-all; text-align:center}
+.confirmar{border:2px solid var(--rojo); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px}
+.aviso{border-left:5px solid var(--amarillo); background:var(--bg); padding:10px 12px; border-radius:8px}
+@media (prefers-reduced-motion: no-preference){ .tarjeta{animation:entra .35s ease-out} @keyframes entra{from{transform:translateY(8px)}to{transform:none}} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#inicio">Misión <span>TecnoHogar</span></a>
+    <span id="estado" class="estado">Modo sin conexión</span>
+  </header>
+
+  <!-- INICIO -->
+  <section id="v-inicio" class="wrap">
+    <h1>¿Qué vas a hacer ahora?</h1>
+    <div class="grid3">
+      <a class="opcion" href="#tarjeta"><span class="ico">🎴</span><b>Mi tarjeta</b><span class="muted">Para el JOIN humano: recibe tu tarjeta de cliente o de pedido.</span></a>
+      <a class="opcion" href="#semaforo"><span class="ico">🚦</span><b>Semáforo de mi grupo</b><span class="muted">Avisa al docente si avanzan, tienen una duda o están trabados.</span></a>
+      <a class="opcion" href="#boleto"><span class="ico">🎟️</span><b>Boleto de salida</b><span class="muted">Al final: qué entendiste hoy y qué todavía te cuesta.</span></a>
+    </div>
+    <p class="muted" style="font-size:.85rem">Bases de Datos I · UNIFRANZ · <a href="#docente" class="volver">Vista docente</a></p>
+  </section>
+
+  <!-- TARJETA -->
+  <section id="v-tarjeta" class="wrap" hidden>
+    <a class="volver" href="#inicio">← Volver</a>
+    <div class="panel" id="pedirTarjeta">
+      <h2>🎴 Tu tarjeta para el JOIN humano</h2>
+      <label for="numLista">Tu número de lista (1 a 35)</label>
+      <input id="numLista" type="number" min="1" max="35" inputmode="numeric" placeholder="Ej.: 7">
+      <button class="btn" id="btnTarjeta" type="button">Ver mi tarjeta</button>
+      <p id="errTarjeta" class="muted" role="alert"></p>
+    </div>
+    <div id="miTarjeta" hidden></div>
+  </section>
+
+  <!-- SEMÁFORO -->
+  <section id="v-semaforo" class="wrap" hidden>
+    <a class="volver" href="#inicio">← Volver</a>
+    <div class="panel">
+      <h2>🚦 Semáforo de mi grupo</h2>
+      <p class="muted">1. Elige tu grupo. 2. Toca un color. Deja el celular parado sobre la mesa con la pantalla hacia el frente.</p>
+      <div class="grupos" id="grupos"></div>
+      <div class="luces">
+        <button class="luz verde" type="button" data-c="verde">🟢<br>Avanzamos</button>
+        <button class="luz amarillo" type="button" data-c="amarillo">🟡<br>Tenemos una duda</button>
+        <button class="luz rojo" type="button" data-c="rojo">🔴<br>Estamos trabados</button>
+      </div>
+      <p id="errSemaforo" class="muted" role="alert"></p>
+    </div>
+  </section>
+  <div id="pantalla" class="pantalla" hidden>
+    <div class="g" id="pg">Grupo 1</div>
+    <div class="m" id="pm">Avanzamos</div>
+    <button class="btn" id="cambiar" type="button">Cambiar color</button>
+  </div>
+
+  <!-- BOLETO -->
+  <section id="v-boleto" class="wrap" hidden>
+    <a class="volver" href="#inicio">← Volver</a>
+    <form class="panel" id="formBoleto">
+      <h2>🎟️ Boleto de salida</h2>
+      <div id="boletoSinConexion" class="aviso" hidden>Esta página no está conectada. Escribe tu boleto en el <b>foro de Moodle</b> de la clase.</div>
+      <label for="bNombre">Tu nombre (opcional)</label>
+      <input id="bNombre" type="text" maxlength="60" autocomplete="name">
+      <label for="bEntendi">Hoy entendí…</label>
+      <textarea id="bEntendi" maxlength="400" required></textarea>
+      <label for="bCuesta">Todavía me cuesta…</label>
+      <textarea id="bCuesta" maxlength="400" required></textarea>
+      <button class="btn" type="submit" id="btnBoleto">Enviar boleto</button>
+      <p id="msgBoleto" role="status"></p>
+    </form>
+  </section>
+
+  <!-- DOCENTE -->
+  <section id="v-docente" class="wrap" hidden>
+    <a class="volver" href="#inicio">← Volver</a>
+    <h1>Vista docente</h1>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="t-semaforo" aria-selected="true">🚦 Tablero</button>
+      <button role="tab" data-tab="t-join" aria-selected="false">🎴 JOIN humano</button>
+      <button role="tab" data-tab="t-boletos" aria-selected="false">🎟️ Boletos</button>
+      <button role="tab" data-tab="t-tarjetas" aria-selected="false">📋 Tarjetas</button>
+      <button role="tab" data-tab="t-qr" aria-selected="false">📱 QR</button>
+    </div>
+
+    <div class="panel" id="t-semaforo">
+      <h2>Tablero de grupos</h2>
+      <div class="tablero" id="tablero"></div>
+      <p class="muted" id="sinVivo1">Para ver el tablero en vivo, la página necesita la configuración de Firebase (ver README).</p>
+      <div class="fila"><button class="btn sec" type="button" data-reset="semaforo">Reiniciar tablero</button></div>
+    </div>
+
+    <div class="panel" id="t-join" hidden>
+      <h2>JOIN humano</h2>
+      <div class="cifras">
+        <div class="cifra"><span class="muted">Tarjetas de cliente</span><b>14</b></div>
+        <div class="cifra"><span class="muted">Tarjetas de pedido</span><b>21</b></div>
+        <div class="cifra"><span class="muted">INNER JOIN (filas)</span><b>21</b></div>
+        <div class="cifra"><span class="muted">LEFT JOIN (filas)</span><b>27</b></div>
+      </div>
+      <h2>Clientes que se declararon NULL <span id="cuentaNull" class="chip n">0</span></h2>
+      <div class="lista" id="listaNull"><p class="muted">Todavía nadie. En la ronda LEFT, los clientes sin pedido tocan «Soy NULL».</p></div>
+      <div class="fila"><button class="btn sec" type="button" id="verRespuesta">Mostrar respuesta</button></div>
+      <div id="respuesta" class="aviso" hidden>Los 6 clientes sin pedidos (los «perdidos» del misterio): <b>12</b> Patricia Cruz, <b>27</b> Carmen Soliz, <b>38</b> Pedro Aguilar, <b>49</b> Pedro Rocha, <b>55</b> Miguel Sánchez y <b>60</b> Fernando Ibáñez. Son reales: en la base nunca hicieron un pedido.</div>
+      <div class="fila"><button class="btn sec" type="button" data-reset="join">Reiniciar JOIN</button></div>
+    </div>
+
+    <div class="panel" id="t-boletos" hidden>
+      <h2>Boletos de salida <span id="cuentaBoletos" class="chip c">0</span></h2>
+      <div class="lista" id="listaBoletos"><p class="muted">Aún no llegan boletos.</p></div>
+      <div class="fila"><button class="btn sec" type="button" data-reset="boletos">Borrar boletos</button></div>
+    </div>
+
+    <div class="panel" id="t-tarjetas" hidden>
+      <h2>Tarjetas por número de lista</h2>
+      <p class="muted">Respaldo sin internet: proyecta esta tabla y que cada uno copie su tarjeta en una hoja.</p>
+      <div class="tabla"><table><thead><tr><th>N.º</th><th>Tipo</th><th>Clave</th><th>Datos</th></tr></thead><tbody id="tablaTarjetas"></tbody></table></div>
+    </div>
+
+    <div class="panel" id="t-qr" hidden>
+      <h2>Entrar desde el celular</h2>
+      <div id="qr"></div>
+      <p class="url" id="urlPagina"></p>
+    </div>
+
+    <div id="confirmar" class="confirmar" hidden>
+      <p id="confirmarTexto"></p>
+      <div class="fila"><button class="btn peligro" type="button" id="siBorrar">Sí, borrar</button><button class="btn sec" type="button" id="noBorrar">Cancelar</button></div>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* =====================================================================
+   1) CONFIGURACIÓN DE FIREBASE
+   Pega aquí el objeto firebaseConfig de tu proyecto (ver README).
+   Si lo dejas en null, la página funciona en "modo sin conexión":
+   tarjetas y semáforo en el celular sí; tablero y boletos no.
+   ===================================================================== */
+const FIREBASE_CONFIG = null;
+
+/* =====================================================================
+   2) TARJETAS (datos reales de TecnoHogar)
+   14 clientes (6 sin pedidos) y 21 pedidos de 8 clientes.
+   INNER JOIN = 21 filas · LEFT JOIN = 21 + 6 NULL = 27 filas.
+   ===================================================================== */
+const CLIENTES = {12:"Patricia Cruz Sánchez",27:"Carmen Soliz Salinas",38:"Pedro Aguilar Claure",49:"Pedro Rocha Rojas",55:"Miguel Sánchez Montaño",
+  60:"Fernando Ibáñez Ortiz",31:"Jorge Fernández Montaño",54:"Hugo Rocha Gutiérrez",2:"Gabriela Rojas Ibáñez",11:"Rosa Delgado Aguilar",
+  26:"Rosa Condori Escobar",33:"Fernando Torrez Camacho",46:"María Terrazas Salinas",58:"Patricia Torrez Quispe"};
+const PEDIDOS = [[114,31,"2025-12-16","virtual"],[547,31,"2026-08-02","virtual"],[603,31,"2026-09-25","físico"],[125,54,"2025-12-24","virtual"],
+  [167,54,"2026-01-06","virtual"],[518,54,"2026-07-25","físico"],[22,2,"2025-11-22","virtual"],[23,2,"2025-11-22","virtual"],[285,2,"2026-03-20","físico"],
+  [84,11,"2025-12-23","virtual"],[153,11,"2026-01-27","virtual"],[301,26,"2026-04-03","físico"],[419,26,"2026-06-07","virtual"],[268,33,"2026-03-22","físico"],
+  [393,33,"2026-05-14","físico"],[432,33,"2026-06-26","físico"],[58,46,"2025-11-06","físico"],[63,46,"2025-12-13","físico"],[451,46,"2026-06-11","físico"],
+  [49,58,"2025-11-02","virtual"],[182,58,"2026-01-24","físico"]];
+// Orden fijo de reparto por número de lista: clientes y pedidos mezclados, sin parejas seguidas.
+const ORDEN = ["C12","P114","P22","C31","P125","C2","P547","C27","P84","C54","P301","C11","P167","P268","C38","P23","C26","P58","P603","C49",
+  "P153","C33","P518","P393","C55","P285","C46","P419","P49","C60","P432","C58","P63","P182","P451"];
+function tarjetaDe(n){
+  const k = ORDEN[n-1]; if(!k) return null;
+  const id = Number(k.slice(1));
+  if(k[0]==="C") return {tipo:"cliente", id, nombre:CLIENTES[id], sinPedido:[12,27,38,49,55,60].includes(id)};
+  const p = PEDIDOS.find(x=>x[0]===id);
+  return {tipo:"pedido", id, fk:p[1], fecha:p[2], canal:p[3]};
+}
+
+/* =====================================================================
+   3) CONEXIÓN
+   ===================================================================== */
+let rtdb = null;
+try{
+  if(FIREBASE_CONFIG && window.firebase){ firebase.initializeApp(FIREBASE_CONFIG); rtdb = firebase.database(); }
+}catch(e){ rtdb = null; }
+const estadoEl = document.getElementById("estado");
+if(rtdb){
+  estadoEl.textContent = "Conectando…";
+  rtdb.ref(".info/connected").on("value", s=>{
+    const ok = s.val() === true;
+    estadoEl.textContent = ok ? "En vivo" : "Reconectando…";
+    estadoEl.classList.toggle("vivo", ok);
+  });
+}
+function guardar(ruta, valor){ if(!rtdb) return Promise.resolve(false); return rtdb.ref(ruta).set(valor).then(()=>true).catch(()=>false); }
+function recordar(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function recuperar(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+
+/* =====================================================================
+   4) VISTAS POR #hash
+   ===================================================================== */
+const VISTAS = ["inicio","tarjeta","semaforo","boleto","docente"];
+function mostrar(){
+  const v = (location.hash || "#inicio").slice(1);
+  const actual = VISTAS.includes(v) ? v : "inicio";
+  VISTAS.forEach(x => document.getElementById("v-"+x).hidden = (x !== actual));
+  if(actual !== "semaforo") document.getElementById("pantalla").hidden = true;
+  if(actual === "docente") iniciarDocente();
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange", mostrar);
+
+/* ---------------- Tarjeta ---------------- */
+const numLista = document.getElementById("numLista");
+document.getElementById("btnTarjeta").addEventListener("click", verTarjeta);
+numLista.addEventListener("keydown", e=>{ if(e.key==="Enter") verTarjeta(); });
+function verTarjeta(){
+  const n = parseInt(numLista.value, 10);
+  const err = document.getElementById("errTarjeta");
+  if(!(n>=1 && n<=35)){ err.textContent = "Escribe un número entre 1 y 35."; return; }
+  err.textContent = "";
+  recordar("mt_lista", n);
+  pintarTarjeta(n, recuperar("mt_null_"+n) === true);
+}
+function pintarTarjeta(n, esNull){
+  const t = tarjetaDe(n), box = document.getElementById("miTarjeta");
+  document.getElementById("pedirTarjeta").hidden = true; box.hidden = false; box.replaceChildren();
+  const card = document.createElement("div");
+  if(t.tipo === "cliente"){
+    card.className = "tarjeta cliente" + (esNull ? " esnull" : "");
+    card.innerHTML = `<span class="tipo">CLIENTE · tabla clientes</span>
+      <span class="muted" style="font-weight:700">PK id_cliente</span>
+      <span class="clave"></span><span class="nombre"></span>`;
+    card.querySelector(".clave").textContent = t.id;
+    card.querySelector(".nombre").textContent = t.nombre;
+    const ins = document.createElement("p");
+    ins.textContent = esNull ? "En el LEFT JOIN apareces igual, pero las columnas del pedido salen vacías: NULL."
+                             : "Busca los pedidos cuya FK id_cliente sea " + t.id + ". Pueden ser varios, o ninguno.";
+    card.appendChild(ins);
+    if(esNull){ const s=document.createElement("div"); s.className="nullsello"; s.textContent="pedido = NULL"; card.appendChild(s); }
+    const b = document.createElement("button"); b.type="button"; b.className = esNull ? "btn sec" : "btn peligro";
+    b.textContent = esNull ? "Me equivoqué: sí tengo pedido" : "Ronda LEFT: no tengo pedido → soy NULL";
+    b.addEventListener("click", ()=>{
+      const nuevo = !esNull; recordar("mt_null_"+n, nuevo);
+      guardar("join/"+n, nuevo ? {id:t.id, nombre:t.nombre, t:Date.now()} : null);
+      pintarTarjeta(n, nuevo);
+    });
+    card.appendChild(b);
+  } else {
+    card.className = "tarjeta pedido";
+    card.innerHTML = `<span class="tipo">PEDIDO · tabla pedidos</span>
+      <span class="muted" style="font-weight:700">PK id_pedido</span>
+      <span class="clave"></span>
+      <span class="fk"></span>
+      <span class="nombre"></span>`;
+    card.querySelector(".clave").textContent = t.id;
+    card.querySelector(".fk").textContent = "FK id_cliente → " + t.fk;
+    card.querySelector(".nombre").textContent = t.fecha + " · " + t.canal;
+    const ins = document.createElement("p");
+    ins.textContent = "Busca al cliente cuyo id_cliente (PK) sea " + t.fk + ". Esa es tu pareja: ON p.id_cliente = c.id_cliente.";
+    card.appendChild(ins);
+  }
+  const otro = document.createElement("button"); otro.type="button"; otro.className="btn sec"; otro.textContent="Cambiar número de lista";
+  otro.addEventListener("click", ()=>{ box.hidden = true; document.getElementById("pedirTarjeta").hidden = false; numLista.focus(); });
+  box.append(card, otro);
+}
+
+/* ---------------- Semáforo ---------------- */
+const MSG = {verde:"Avanzamos", amarillo:"Tenemos una duda", rojo:"Estamos trabados"};
+let grupoSel = recuperar("mt_grupo");
+const gruposEl = document.getElementById("grupos");
+for(let g=1; g<=7; g++){
+  const b = document.createElement("button"); b.type="button"; b.textContent = g; b.setAttribute("aria-pressed", String(g===grupoSel));
+  b.setAttribute("aria-label","Grupo "+g);
+  b.addEventListener("click", ()=>{ grupoSel = g; recordar("mt_grupo", g);
+    gruposEl.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed", String(Number(x.textContent)===g))); });
+  gruposEl.appendChild(b);
+}
+document.querySelectorAll(".luz").forEach(b => b.addEventListener("click", ()=>{
+  const err = document.getElementById("errSemaforo");
+  if(!grupoSel){ err.textContent = "Primero elige el número de tu grupo."; return; }
+  err.textContent = "";
+  const c = b.dataset.c;
+  guardar("semaforo/g"+grupoSel, {c, t:Date.now()});
+  const p = document.getElementById("pantalla");
+  p.className = "pantalla " + c; p.hidden = false;
+  document.getElementById("pg").textContent = "Grupo " + grupoSel;
+  document.getElementById("pm").textContent = MSG[c];
+}));
+document.getElementById("cambiar").addEventListener("click", ()=> document.getElementById("pantalla").hidden = true);
+
+/* ---------------- Boleto ---------------- */
+if(!rtdb){ document.getElementById("boletoSinConexion").hidden = false; document.getElementById("btnBoleto").disabled = true; }
+document.getElementById("formBoleto").addEventListener("submit", e=>{
+  e.preventDefault();
+  const msg = document.getElementById("msgBoleto");
+  if(!rtdb){ msg.textContent = "Sin conexión: usa el foro de Moodle."; return; }
+  const d = { nombre: document.getElementById("bNombre").value.trim().slice(0,60),
+              entendi: document.getElementById("bEntendi").value.trim().slice(0,400),
+              cuesta: document.getElementById("bCuesta").value.trim().slice(0,400), t: Date.now() };
+  if(!d.entendi || !d.cuesta){ msg.textContent = "Completa las dos frases."; return; }
+  document.getElementById("btnBoleto").disabled = true; msg.textContent = "Enviando…";
+  rtdb.ref("boletos").push(d).then(()=>{ msg.textContent = "¡Listo! Tu boleto llegó. Gracias."; e.target.reset(); })
+    .catch(()=>{ msg.textContent = "No se pudo enviar. Intenta otra vez."; })
+    .finally(()=>{ document.getElementById("btnBoleto").disabled = false; });
+});
+
+/* ---------------- Docente ---------------- */
+let docenteListo = false;
+function iniciarDocente(){
+  if(docenteListo) return; docenteListo = true;
+  // Pestañas
+  document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", ()=>{
+    document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected", String(x===b)));
+    ["t-semaforo","t-join","t-boletos","t-tarjetas","t-qr"].forEach(id => document.getElementById(id).hidden = (id !== b.dataset.tab));
+  }));
+  // Tablero (vacío hasta que lleguen datos)
+  const tablero = document.getElementById("tablero");
+  function pintarTablero(datos){
+    tablero.replaceChildren();
+    for(let g=1; g<=7; g++){
+      const d = datos && datos["g"+g];
+      const m = document.createElement("div"); m.className = "mesa" + (d ? " "+d.c : "");
+      const b = document.createElement("b"); b.textContent = g;
+      const s = document.createElement("span"); s.textContent = d ? MSG[d.c] : "Sin señal";
+      const sm = document.createElement("small"); sm.textContent = d ? hace(d.t) : "";
+      m.append(b, s, sm); tablero.appendChild(m);
+    }
+  }
+  pintarTablero(null);
+  // Tabla de tarjetas
+  const tb = document.getElementById("tablaTarjetas");
+  for(let n=1; n<=35; n++){
+    const t = tarjetaDe(n), tr = document.createElement("tr");
+    const datos = t.tipo==="cliente" ? t.nombre : "FK id_cliente → " + t.fk + " · " + t.fecha;
+    tr.innerHTML = `<td>${n}</td><td><span class="chip ${t.tipo==="cliente"?"c":"p"}">${t.tipo}</span></td><td style="font-family:var(--mono)">${t.id}</td><td></td>`;
+    tr.lastChild.textContent = datos; tb.appendChild(tr);
+  }
+  // QR
+  const url = location.href.split("#")[0];
+  document.getElementById("urlPagina").textContent = url;
+  if(window.QRCode){ new QRCode(document.getElementById("qr"), {text:url, width:260, height:260}); }
+  // Respuesta del JOIN
+  document.getElementById("verRespuesta").addEventListener("click", e=>{
+    const r = document.getElementById("respuesta"); r.hidden = !r.hidden; e.target.textContent = r.hidden ? "Mostrar respuesta" : "Ocultar respuesta";
+  });
+  // Datos en vivo
+  if(rtdb){
+    document.getElementById("sinVivo1").hidden = true;
+    rtdb.ref("semaforo").on("value", s => pintarTablero(s.val()));
+    setInterval(()=> rtdb.ref("semaforo").once("value").then(s=>pintarTablero(s.val())), 30000);
+    rtdb.ref("join").on("value", s=>{
+      const v = s.val() || {}, lista = document.getElementById("listaNull"), ks = Object.keys(v);
+      document.getElementById("cuentaNull").textContent = ks.length;
+      lista.replaceChildren();
+      if(!ks.length){ const p=document.createElement("p"); p.className="muted"; p.textContent="Todavía nadie."; lista.appendChild(p); return; }
+      ks.sort((a,b)=>v[a].id-v[b].id).forEach(k=>{
+        const d = document.createElement("div"); d.className="boleto";
+        d.textContent = "id_cliente " + v[k].id + " · " + v[k].nombre + " (lista " + k + ")";
+        lista.appendChild(d);
+      });
+    });
+    rtdb.ref("boletos").on("value", s=>{
+      const v = s.val() || {}, ks = Object.keys(v).sort((a,b)=>v[b].t-v[a].t), lista = document.getElementById("listaBoletos");
+      document.getElementById("cuentaBoletos").textContent = ks.length;
+      lista.replaceChildren();
+      if(!ks.length){ const p=document.createElement("p"); p.className="muted"; p.textContent="Aún no llegan boletos."; lista.appendChild(p); return; }
+      ks.forEach(k=>{
+        const b = v[k], d = document.createElement("div"); d.className="boleto";
+        const n = document.createElement("b"); n.textContent = b.nombre || "Anónimo";
+        const q1 = document.createElement("span"); q1.className="q"; q1.textContent="Hoy entendí";
+        const a1 = document.createElement("span"); a1.textContent = b.entendi;
+        const q2 = document.createElement("span"); q2.className="q"; q2.textContent="Todavía me cuesta";
+        const a2 = document.createElement("span"); a2.textContent = b.cuesta;
+        d.append(n,q1,a1,q2,a2); lista.appendChild(d);
+      });
+    });
+  }
+  // Reinicios con confirmación en la página
+  let rutaBorrar = null;
+  const conf = document.getElementById("confirmar");
+  const NOMBRES = {semaforo:"el tablero del semáforo", join:"los NULL del JOIN humano", boletos:"todos los boletos de salida"};
+  document.querySelectorAll("[data-reset]").forEach(b => b.addEventListener("click", ()=>{
+    if(!rtdb){ return; }
+    rutaBorrar = b.dataset.reset;
+    document.getElementById("confirmarTexto").textContent = "¿Borrar " + NOMBRES[rutaBorrar] + "? No se puede deshacer.";
+    conf.hidden = false; conf.scrollIntoView({block:"center"});
+  }));
+  document.getElementById("noBorrar").addEventListener("click", ()=>{ conf.hidden = true; rutaBorrar = null; });
+  document.getElementById("siBorrar").addEventListener("click", ()=>{
+    if(rtdb && rutaBorrar) rtdb.ref(rutaBorrar).remove();
+    conf.hidden = true; rutaBorrar = null;
+  });
+}
+function hace(t){ const s = Math.max(0, Math.round((Date.now()-t)/1000)); return s < 60 ? "hace " + s + " s" : "hace " + Math.round(s/60) + " min"; }
+
+/* Arranque */
+const ultimo = recuperar("mt_lista"); if(ultimo) numLista.value = ultimo;
+mostrar();
+</script>
+</body>
+</html>
