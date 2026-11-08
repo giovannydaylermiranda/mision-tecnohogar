@@ -107,6 +107,81 @@ th{background:var(--bg)}
 .url{font-family:var(--mono); font-size:1rem; word-break:break-all; text-align:center}
 .confirmar{border:2px solid var(--rojo); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px}
 .aviso{border-left:5px solid var(--amarillo); background:var(--bg); padding:10px 12px; border-radius:8px}
+/* ===== Quiz en vivo ===== */
+.arena{position:fixed; inset:0; z-index:30; overflow:auto; color:#fff; display:flex; flex-direction:column; gap:14px;
+  background:radial-gradient(circle at 15% 10%, #6d28d9 0%, #3b1a8a 35%, #1a0f4a 75%, #0d0828 100%);
+  padding:max(14px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  transition:background .4s}
+.arena.ok{background:radial-gradient(circle at 50% 30%, #22c55e, #15803d 60%, #0b4f26)}
+.arena.mal{background:radial-gradient(circle at 50% 30%, #f43f5e, #b91c1c 60%, #6b0f0f)}
+.arena.nada{background:radial-gradient(circle at 50% 30%, #64748b, #334155 60%, #1e293b)}
+.arena .muted{color:rgba(255,255,255,.75)}
+.arena a{color:#fff}
+.atop{display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.9rem}
+.atop a{text-decoration:none; opacity:.8}
+.logoQ{font-family:var(--display); font-weight:800; font-size:clamp(2.4rem,10vw,5rem); line-height:1; letter-spacing:-1px}
+.logoQ span{color:#facc15}
+.fb{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px; width:100%; max-width:640px; margin:0 auto}
+.fb input{background:#fff; color:#1a0f4a; border:0; text-align:center; font-weight:700}
+.btnQ{font:inherit; font-weight:800; font-size:1.15rem; border:0; border-radius:12px; padding:14px 26px; cursor:pointer; background:#facc15; color:#1a0f4a; box-shadow:0 5px 0 #a16207; text-decoration:none; display:inline-block}
+.btnQ:active{transform:translateY(3px); box-shadow:0 2px 0 #a16207}
+.btnQ.sec{background:rgba(255,255,255,.15); color:#fff; box-shadow:0 5px 0 rgba(0,0,0,.3)}
+.btnQ:disabled{opacity:.5; cursor:default}
+.big{font-family:var(--display); font-weight:800; font-size:clamp(2.2rem,9vw,4.8rem); line-height:1.02}
+.mid{font-family:var(--display); font-weight:800; font-size:clamp(1.3rem,4.5vw,2.4rem); line-height:1.15; text-wrap:balance}
+.pulso{animation:pulso 1.4s ease-in-out infinite}
+@keyframes pulso{50%{transform:scale(1.06); opacity:.85}}
+.giro{width:56px; height:56px; border-radius:50%; border:6px solid rgba(255,255,255,.25); border-top-color:#facc15; animation:giro 1s linear infinite}
+@keyframes giro{to{transform:rotate(360deg)}}
+.barraT{height:12px; background:rgba(255,255,255,.18); border-radius:99px; overflow:hidden}
+.barraT i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#facc15,#fb923c)}
+.ops{display:grid; grid-template-columns:1fr 1fr; gap:12px; flex:1}
+.op{font:inherit; color:#fff; border:0; border-radius:16px; display:flex; align-items:center; gap:12px; padding:16px; text-align:left; min-height:96px;
+  cursor:pointer; font-weight:700; font-size:1.05rem; box-shadow:0 6px 0 rgba(0,0,0,.3); transition:transform .08s, opacity .4s}
+.op:active{transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.op .sh{font-size:2rem; flex:none; line-height:1}
+.op .t{overflow-wrap:anywhere}
+.op.code .t{font-family:var(--mono); font-size:.95rem}
+.op0{background:#e11d48} .op1{background:#2563eb} .op2{background:#d97706} .op3{background:#16a34a}
+.op.apagada{opacity:.22}
+.op.buena{outline:6px solid #fff; outline-offset:-6px}
+.chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center}
+.chips span{background:rgba(255,255,255,.16); padding:7px 14px; border-radius:99px; font-weight:700; animation:pop .45s ease-out}
+@keyframes pop{0%{transform:scale(.2); opacity:0} 75%{transform:scale(1.12)} 100%{transform:none; opacity:1}}
+.host{font-size:20px}
+.host .ops{flex:none} .host .op{min-height:120px; font-size:1.5rem; cursor:default} .host .op.code .t{font-size:1.3rem}
+.hq{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:18px}
+.reloj{position:relative; width:120px; height:120px}
+.reloj svg{transform:rotate(-90deg)} .reloj circle{fill:none; stroke-width:12}
+.reloj .rb{stroke:rgba(255,255,255,.18)} .reloj .rf{stroke:#facc15; stroke-linecap:round; stroke-dasharray:326.73; transition:stroke-dashoffset .2s linear}
+.reloj b{position:absolute; inset:0; display:grid; place-items:center; font-family:var(--mono); font-size:2.4rem}
+.cont{text-align:center; font-family:var(--display)} .cont b{display:block; font-size:2.6rem; line-height:1}
+.lobby{display:grid; grid-template-columns:auto 1fr; gap:28px; align-items:start}
+.lobby .qrbox{background:#fff; padding:14px; border-radius:16px}
+.barras{display:flex; justify-content:center; align-items:flex-end; gap:22px; height:200px}
+.barra{width:90px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:6px; height:100%}
+.barra i{display:block; width:100%; border-radius:10px 10px 0 0; height:0; transition:height .9s cubic-bezier(.2,.9,.3,1.2)}
+.barra b{font-family:var(--mono); font-size:1.6rem}
+.rank{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; width:100%; max-width:760px; align-self:center}
+.rank li{display:flex; justify-content:space-between; gap:12px; background:rgba(255,255,255,.12); padding:14px 20px; border-radius:14px; font-weight:700; font-size:1.4rem; animation:entraIzq .5s ease-out both}
+.rank li:first-child{background:#facc15; color:#1a0f4a}
+.rank li span:last-child{font-family:var(--mono)}
+@keyframes entraIzq{from{transform:translateX(-60px); opacity:0} to{transform:none; opacity:1}}
+.podio{display:flex; justify-content:center; align-items:flex-end; gap:14px; flex:1; min-height:340px}
+.pcol{width:min(28vw,240px); display:flex; flex-direction:column; align-items:center; gap:8px}
+.pcol .pn{font-weight:800; font-size:1.3rem; text-align:center; animation:pop .5s ease-out both}
+.pcol .pb{width:100%; border-radius:14px 14px 0 0; display:flex; flex-direction:column; align-items:center; padding-top:12px; transform-origin:bottom; animation:sube 1s cubic-bezier(.2,.9,.3,1.1) both}
+.pcol .pb b{font-family:var(--display); font-size:3rem; line-height:1} .pcol .pb span{font-family:var(--mono)}
+@keyframes sube{from{transform:scaleY(0)} to{transform:scaleY(1)}}
+.inf table{background:#fff; color:#14213d; border-radius:10px; overflow:hidden} .inf th{background:#ede9fe}
+.inf{background:rgba(255,255,255,.08); border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:14px}
+.comp{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px}
+.comp > div{background:rgba(255,255,255,.12); border-radius:14px; padding:14px; display:grid; gap:6px}
+.cbar{height:16px; background:rgba(255,255,255,.15); border-radius:99px; overflow:hidden} .cbar i{display:block; height:100%; border-radius:99px}
+#confeti{position:fixed; inset:0; pointer-events:none; z-index:40}
+@media (max-width:700px){ .lobby{grid-template-columns:1fr} .hq{grid-template-columns:1fr 1fr} .hq .mid{grid-column:1/-1; order:-1} .host .op{min-height:90px; font-size:1.1rem} }
+@media (max-width:420px){ .op{min-height:84px; padding:12px; font-size:.98rem} .op .sh{font-size:1.6rem} }
+@media (prefers-reduced-motion: reduce){ .pulso,.giro,.chips span,.rank li,.pcol .pb,.pcol .pn{animation:none} }
 @media (prefers-reduced-motion: no-preference){ .tarjeta{animation:entra .35s ease-out} @keyframes entra{from{transform:translateY(8px)}to{transform:none}} }
 </style>
 </head>
@@ -123,6 +198,7 @@ th{background:var(--bg)}
     <div class="grid3">
       <a class="opcion" href="#tarjeta"><span class="ico">🎴</span><b>Mi tarjeta</b><span class="muted">Para el JOIN humano: recibe tu tarjeta de cliente o de pedido.</span></a>
       <a class="opcion" href="#semaforo"><span class="ico">🚦</span><b>Semáforo de mi grupo</b><span class="muted">Avisa al docente si avanzan, tienen una duda o están trabados.</span></a>
+      <a class="opcion" href="#quiz"><span class="ico">🎮</span><b>Quiz en vivo</b><span class="muted">Responde desde tu celular cuando el docente lance el quiz.</span></a>
       <a class="opcion" href="#boleto"><span class="ico">🎟️</span><b>Boleto de salida</b><span class="muted">Al final: qué entendiste hoy y qué todavía te cuesta.</span></a>
     </div>
     <p class="muted" style="font-size:.85rem">Bases de Datos I · UNIFRANZ · <a href="#docente" class="volver">Vista docente</a></p>
@@ -181,6 +257,11 @@ th{background:var(--bg)}
     </form>
   </section>
 
+  <!-- QUIZ: estudiante (celular) -->
+  <section id="v-quiz" hidden><div id="arenaA" class="arena"></div></section>
+  <!-- QUIZ: docente (proyector) -->
+  <section id="v-juego" hidden><div id="arenaH" class="arena host"></div></section>
+
   <!-- DOCENTE -->
   <section id="v-docente" class="wrap" hidden>
     <a class="volver" href="#inicio">← Volver</a>
@@ -191,6 +272,13 @@ th{background:var(--bg)}
       <button role="tab" data-tab="t-boletos" aria-selected="false">🎟️ Boletos</button>
       <button role="tab" data-tab="t-tarjetas" aria-selected="false">📋 Tarjetas</button>
       <button role="tab" data-tab="t-qr" aria-selected="false">📱 QR</button>
+      <button role="tab" data-tab="t-quiz" aria-selected="false">🎮 Quiz</button>
+    </div>
+
+    <div class="panel" id="t-quiz" hidden>
+      <h2>Quiz en vivo</h2>
+      <p class="muted">Abre esta pantalla en la computadora del proyector. Los estudiantes entran desde su celular a <b>🎮 Quiz en vivo</b>.</p>
+      <div class="fila"><a class="btn" href="#juego">Abrir pantalla del quiz ▶</a></div>
     </div>
 
     <div class="panel" id="t-semaforo">
@@ -308,13 +396,17 @@ function recuperar(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e
 /* =====================================================================
    4) VISTAS POR #hash
    ===================================================================== */
-const VISTAS = ["inicio","tarjeta","semaforo","boleto","docente"];
+const VISTAS = ["inicio","tarjeta","semaforo","boleto","docente","quiz","juego"];
 function mostrar(){
   const v = (location.hash || "#inicio").slice(1);
   const actual = VISTAS.includes(v) ? v : "inicio";
   VISTAS.forEach(x => document.getElementById("v-"+x).hidden = (x !== actual));
   if(actual !== "semaforo") document.getElementById("pantalla").hidden = true;
   if(actual === "docente") iniciarDocente();
+  vistaActual = actual;
+  if(actual === "quiz" || actual === "juego"){ suscribirQuiz(); keyA = ""; keyH = ""; pintarQuiz(); }
+  if(actual === "juego"){ if(!hostTimer) hostTimer = setInterval(tickHost, 200); }
+  else if(hostTimer){ clearInterval(hostTimer); hostTimer = null; }
   window.scrollTo(0,0);
 }
 window.addEventListener("hashchange", mostrar);
@@ -422,7 +514,7 @@ function iniciarDocente(){
   // Pestañas
   document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", ()=>{
     document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected", String(x===b)));
-    ["t-semaforo","t-join","t-boletos","t-tarjetas","t-qr"].forEach(id => document.getElementById(id).hidden = (id !== b.dataset.tab));
+    ["t-semaforo","t-join","t-boletos","t-tarjetas","t-qr","t-quiz"].forEach(id => document.getElementById(id).hidden = (id !== b.dataset.tab));
   }));
   // Tablero (vacío hasta que lleguen datos)
   const tablero = document.getElementById("tablero");
@@ -518,6 +610,312 @@ function onCorrecto(txt){
   return x === "p.id_sucursal=s.id_sucursal" || x === "s.id_sucursal=p.id_sucursal";
 }
 function hace(t){ const s = Math.max(0, Math.round((Date.now()-t)/1000)); return s < 60 ? "hace " + s + " s" : "hace " + Math.round(s/60) + " min"; }
+
+/* =====================================================================
+   5) QUIZ EN VIVO
+   Firebase:  quiz/estado = {set, i, fase, inicio, dur}
+              quiz/s/<set>/jug/<id>      = {n}
+              quiz/s/<set>/resp/<i>/<id> = {r, ms}
+   fases: espera → pregunta → resultado → ranking → (pregunta…) → podio
+   ===================================================================== */
+const PREG = [
+  {q:"Un pedido tiene id_cliente = 31. ¿Con qué columna de clientes se une?", op:["c.id_cliente","c.id_pedido","c.nombres","c.id_sucursal"], ok:0, dur:30, code:true},
+  {q:"¿Qué consulta muestra los clientes que NO tienen pedidos?", op:["INNER JOIN … WHERE p.id_pedido IS NULL","LEFT JOIN … WHERE p.id_pedido IS NULL","LEFT JOIN … WHERE p.id_pedido = NULL","SELECT * FROM pedidos WHERE id_cliente IS NULL"], ok:1, dur:45, code:true},
+  {q:"INNER JOIN de clientes con pedidos: ¿qué pasa con un cliente que no tiene pedidos?", op:["Aparece con NULL","No aparece en el resultado","SQL Server muestra un error","Aparece repetido"], ok:1, dur:30},
+  {q:"En un LEFT JOIN, ¿qué valor tiene p.id_pedido para un cliente sin pedidos?", op:["0","Texto vacío ''","NULL","El id del cliente"], ok:2, dur:30},
+  {q:"ON p.id_pedido = c.id_cliente   ¿Qué hace SQL Server?", op:["Muestra un mensaje de error","No devuelve ninguna fila","Corre sin error pero empareja mal","Une bien cada pedido con su cliente"], ok:2, dur:30}
+];
+const SETS = { antes:{nombre:"Antes de la clase", qs:[0,1]}, final:{nombre:"Quiz final", qs:[0,1,2,3,4]} };
+const FIG = ["▲","◆","●","■"];
+const CIRC = 326.73;
+let vistaActual = "inicio", est = null, dataSet = null, setSub = null, keyA = "", keyH = "", hostTimer = null;
+let miNombre = recuperar("mt_nombre") || "", respLocal = "", uniendo = {}, verInforme = false, confirmaBorrar = false;
+let sonido = recuperar("mt_sonido") !== false, ultSeg = -1, ultBeat = -1, cerrando = "";
+let off = 0; if(rtdb) rtdb.ref(".info/serverTimeOffset").on("value", s => off = s.val() || 0);
+const ahora = () => Date.now() + off;
+const MI_ID = recuperar("mt_pid") || ("j" + Math.random().toString(36).slice(2, 10)); recordar("mt_pid", MI_ID);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function suscribirQuiz(){
+  if(!rtdb || suscribirQuiz.ok) return; suscribirQuiz.ok = true;
+  rtdb.ref("quiz/estado").on("value", s=>{
+    est = s.val();
+    const set = est && est.set;
+    if(set !== setSub){
+      if(setSub) rtdb.ref("quiz/s/" + setSub).off();
+      setSub = set; dataSet = null;
+      if(set) rtdb.ref("quiz/s/" + set).on("value", x => { dataSet = x.val() || {}; pintarQuiz(); });
+    }
+    pintarQuiz();
+  });
+}
+function pintarQuiz(){ if(vistaActual === "quiz") pintarAlumno(); else if(vistaActual === "juego") pintarHost(); }
+function qDe(set, i){ return PREG[SETS[set].qs[i]]; }
+function respDe(i, id){ const r = dataSet && dataSet.resp; const ri = r && r[i]; return ri ? ri[id] : null; }
+function nResp(i){ const r = dataSet && dataSet.resp; const ri = r && r[i]; return ri ? Object.keys(ri).filter(k => ri[k]).length : 0; }
+function puntos(q, r){ if(!r || r.r !== q.ok) return 0; const D = q.dur * 1000; return Math.round(1000 * (1 - Math.min(Math.max(r.ms, 0), D) / D / 2)); }
+function tabla(set, d){
+  const jug = (d && d.jug) || {}, resp = (d && d.resp) || {}, qs = SETS[set].qs;
+  return Object.keys(jug).map(id => {
+    let tot = 0; const ac = qs.map((qi, i) => { const ri = resp[i], r = ri ? ri[id] : null; tot += puntos(PREG[qi], r); return r ? (r.r === PREG[qi].ok ? 1 : 0) : null; });
+    return {id, n: jug[id].n, tot, ac};
+  }).sort((a, b) => b.tot - a.tot || a.n.localeCompare(b.n));
+}
+function nJug(){ return dataSet && dataSet.jug ? Object.keys(dataSet.jug).length : 0; }
+
+/* ---------- Sonido (solo en el proyector) ---------- */
+let actx = null;
+function tono(f, d = .12, tipo = "sine", vol = .12){
+  if(!sonido) return;
+  try{ actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain(); o.type = tipo; o.frequency.value = f;
+    g.gain.setValueAtTime(vol, actx.currentTime); g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + d);
+    o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime + d); }catch(e){}
+}
+const MELO = [262, 330, 392, 330, 294, 349, 440, 349];
+function fanfarria(){ [523, 659, 784, 1047, 784, 1047].forEach((f, k) => setTimeout(() => tono(f, .3, "triangle", .15), k * 150)); }
+
+/* ---------- Confeti ---------- */
+function confeti(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.createElement("canvas"); c.id = "confeti"; document.body.appendChild(c);
+  const x = c.getContext("2d"); c.width = innerWidth; c.height = innerHeight;
+  const col = ["#facc15","#e11d48","#2563eb","#16a34a","#d97706","#ffffff"];
+  const P = Array.from({length:160}, () => ({x:Math.random()*c.width, y:-20-Math.random()*c.height*.5, vx:(Math.random()-.5)*3, vy:2+Math.random()*4, r:Math.random()*6.28, w:6+Math.random()*6, c:col[(Math.random()*col.length)|0]}));
+  const t0 = performance.now();
+  (function f(t){ x.clearRect(0,0,c.width,c.height);
+    P.forEach(p => { p.x += p.vx; p.y += p.vy; p.r += .1; x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.w/2,-p.w/4,p.w,p.w/2); x.restore(); });
+    if(t - t0 < 4500) requestAnimationFrame(f); else c.remove(); })(t0);
+}
+
+/* ---------- Estudiante ---------- */
+function asegurarUnion(){
+  if(!miNombre || !setSub || !dataSet || uniendo[setSub]) return;
+  if(dataSet.jug && dataSet.jug[MI_ID]) return;
+  uniendo[setSub] = true;
+  rtdb.ref("quiz/s/" + setSub + "/jug/" + MI_ID).set({n: miNombre, t: Date.now()});
+}
+function pintarAlumno(){
+  const A = document.getElementById("arenaA");
+  const top = `<div class="atop"><a href="#inicio">← Salir</a><span>${miNombre ? "👤 " + esc(miNombre) : ""}</span></div>`;
+  if(!rtdb){ if(keyA !== "off"){ keyA = "off"; A.className = "arena"; A.innerHTML = top + `<div class="fb"><div class="logoQ">Quiz <span>JOIN</span></div><p>Esta página no está conectada a internet. Avisa al docente.</p></div>`; } return; }
+  if(!miNombre){
+    if(keyA === "nombre") return; keyA = "nombre"; A.className = "arena";
+    A.innerHTML = top + `<form class="fb" id="fNombre"><div class="logoQ">Quiz <span>JOIN</span></div>
+      <label for="qNombre">Tu nombre y apellido</label><input id="qNombre" maxlength="40" autocomplete="name" required placeholder="Ej.: Ana Rojas">
+      <button class="btnQ" type="submit">¡Entrar!</button></form>`;
+    document.getElementById("fNombre").addEventListener("submit", e => { e.preventDefault();
+      const v = document.getElementById("qNombre").value.trim().replace(/\s+/g, " ").slice(0, 40); if(v.length < 3) return;
+      miNombre = v; recordar("mt_nombre", v); uniendo = {}; keyA = ""; pintarAlumno(); });
+    return;
+  }
+  asegurarUnion();
+  const f = est && est.set ? est.fase : "nada", set = est && est.set, i = est ? est.i : -1;
+  const mia = set ? respDe(i, MI_ID) : null, envie = mia || respLocal === set + "|" + i;
+  let key = [f, set, i, envie ? 1 : 0].join("|"), extra = null;
+  if(f === "resultado" || f === "ranking" || f === "podio"){
+    const t = tabla(set, dataSet), pos = t.findIndex(x => x.id === MI_ID);
+    extra = {t, pos, yo: t[pos]}; key += "|" + pos + "|" + (extra.yo ? extra.yo.tot : 0) + "|" + (mia ? mia.r : "");
+  }
+  if(key === keyA) return; keyA = key; A.className = "arena";
+  const cambiar = `<button class="btnQ sec" type="button" id="cambiarNombre" style="font-size:.9rem;padding:8px 14px">Cambiar nombre</button>`;
+  if(f === "nada" || f === "espera"){
+    A.innerHTML = top + `<div class="fb"><div class="big pulso">¡Estás dentro!</div><p class="mid">${esc(miNombre)}</p>
+      <p class="muted">Mira la pantalla del docente. El quiz empieza en un momento…</p>${cambiar}</div>`;
+    document.getElementById("cambiarNombre").addEventListener("click", () => { miNombre = ""; recordar("mt_nombre", ""); keyA = ""; pintarAlumno(); });
+    return;
+  }
+  const q = qDe(set, i), N = SETS[set].qs.length;
+  if(f === "pregunta" && !envie){
+    const D = q.dur * 1000, rem = D - (ahora() - est.inicio);
+    if(rem <= 0){ A.innerHTML = top + `<div class="fb"><div class="big">⏰</div><p class="mid">Se acabó el tiempo</p></div>`; return; }
+    A.innerHTML = top + `<div class="muted">Pregunta ${i + 1} de ${N}</div><div class="mid" style="font-size:clamp(1.1rem,4.6vw,1.6rem)">${esc(q.q)}</div>
+      <div class="barraT"><i id="aBar"></i></div>
+      <div class="ops">${q.op.map((o, k) => `<button type="button" class="op op${k}${q.code ? " code" : ""}" data-k="${k}"><span class="sh">${FIG[k]}</span><span class="t">${esc(o)}</span></button>`).join("")}</div>`;
+    const bar = document.getElementById("aBar"); bar.style.width = (rem / D * 100) + "%";
+    requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.transition = "width " + rem + "ms linear"; bar.style.width = "0%"; }));
+    A.querySelectorAll(".op").forEach(b => b.addEventListener("click", () => responder(Number(b.dataset.k))));
+    return;
+  }
+  if(f === "pregunta"){
+    A.innerHTML = top + `<div class="fb"><div class="giro"></div><div class="big">¡Respuesta enviada!</div><p class="muted">¿Habrás acertado? Mira la pantalla…</p></div>`;
+    return;
+  }
+  if(f === "resultado" || f === "ranking"){
+    const pts = puntos(q, mia), ok = mia && mia.r === q.ok, n = extra.t.length;
+    A.className = "arena " + (!mia ? "nada" : ok ? "ok" : "mal");
+    A.innerHTML = top + `<div class="fb"><div class="big">${!mia ? "⏰ Sin respuesta" : ok ? "✔ ¡Correcto!" : "✖ Incorrecto"}</div>
+      ${ok ? `<div class="mid pulso">+${pts} puntos</div>` : `<p class="mid" style="font-size:1.2rem">Respuesta correcta: <span style="font-family:var(--mono)">${FIG[q.ok]} ${esc(q.op[q.ok])}</span></p>`}
+      <p class="mid" style="font-size:1.3rem">Total: ${extra.yo ? extra.yo.tot : 0} · Puesto ${extra.pos + 1} de ${n}</p></div>`;
+    if(ok && navigator.vibrate) navigator.vibrate([40, 40, 80]);
+    return;
+  }
+  if(f === "podio"){
+    const p = extra.pos + 1, med = ["🥇","🥈","🥉"][extra.pos] || "🎉";
+    A.innerHTML = top + `<div class="fb"><div class="big">${med}</div><div class="mid">Terminaste en el puesto ${p} de ${extra.t.length}</div>
+      <p class="mid" style="font-size:1.3rem">${extra.yo ? extra.yo.tot : 0} puntos · ${extra.yo ? extra.yo.ac.filter(x => x === 1).length : 0} de ${N} correctas</p><p class="muted">¡Gracias por jugar!</p></div>`;
+    if(extra.pos >= 0 && extra.pos < 3) confeti();
+  }
+}
+function responder(k){
+  if(!est || est.fase !== "pregunta") return;
+  const set = est.set, i = est.i, q = qDe(set, i);
+  if(respDe(i, MI_ID) || respLocal === set + "|" + i) return;
+  const ms = Math.max(0, ahora() - est.inicio); if(ms > q.dur * 1000) return;
+  respLocal = set + "|" + i; if(navigator.vibrate) navigator.vibrate(30);
+  rtdb.ref("quiz/s/" + set + "/resp/" + i + "/" + MI_ID).set({r: k, ms: Math.round(ms)});
+  pintarAlumno();
+}
+
+/* ---------- Proyector (docente) ---------- */
+function irA(estado){ cerrando = ""; ultSeg = -1; return rtdb.ref("quiz/estado").set(estado); }
+function siguiente(){
+  const set = est.set, i = est.i + 1, N = SETS[set].qs.length;
+  if(i >= N){ irA({set, i: est.i, fase: "podio"}); return; }
+  irA({set, i, fase: "pregunta", inicio: firebase.database.ServerValue.TIMESTAMP, dur: qDe(set, i).dur});
+}
+function pintarHost(){
+  const H = document.getElementById("arenaH");
+  const top = (extra = "") => `<div class="atop"><a href="#docente">← Vista docente</a><span style="display:flex;gap:10px;align-items:center">${extra}<button class="btnQ sec" type="button" id="hSon" style="font-size:.9rem;padding:8px 12px">${sonido ? "🔊" : "🔇"}</button></span></div>`;
+  const conSon = () => { const b = document.getElementById("hSon"); if(b) b.onclick = () => { sonido = !sonido; recordar("mt_sonido", sonido); b.textContent = sonido ? "🔊" : "🔇"; }; };
+  if(!rtdb){ if(keyH !== "off"){ keyH = "off"; H.innerHTML = top() + `<div class="fb"><div class="logoQ">Quiz <span>JOIN</span></div><p>Falta la configuración de Firebase.</p></div>`; conSon(); } return; }
+  if(verInforme){ if(keyH !== "inf"){ keyH = "inf"; pintarInforme(H, top()); conSon(); } return; }
+  const f = est && est.set ? est.fase : "nada", set = est && est.set, i = est ? est.i : -1, nj = nJug();
+  if(f === "nada"){
+    const k = "nada|" + confirmaBorrar; if(keyH === k) return; keyH = k;
+    H.innerHTML = top() + `<div class="fb" style="max-width:900px"><div class="logoQ">Quiz <span>JOIN</span></div>
+      <p class="muted">Elige qué quiz vas a lanzar. Los estudiantes entran desde su celular a «🎮 Quiz en vivo».</p>
+      <div class="fila" style="justify-content:center">
+        <button class="btnQ" type="button" data-abrir="antes">▶ Antes de la clase · 2 preguntas</button>
+        <button class="btnQ" type="button" data-abrir="final">▶ Quiz final · 5 preguntas</button></div>
+      <div class="fila" style="justify-content:center"><button class="btnQ sec" type="button" id="hInf">📊 Informe</button>
+        <button class="btnQ sec" type="button" id="hBorrar">🗑️ Borrar resultados</button></div>
+      ${confirmaBorrar ? `<div class="inf"><p>¿Borrar los resultados de los dos quizzes? No se puede deshacer.</p><div class="fila" style="justify-content:center"><button class="btnQ" type="button" id="hSi" style="background:#ef4444;color:#fff;box-shadow:0 5px 0 #991b1b">Sí, borrar</button><button class="btnQ sec" type="button" id="hNo">Cancelar</button></div></div>` : ""}</div>`;
+    conSon();
+    H.querySelectorAll("[data-abrir]").forEach(b => b.onclick = () => { tono(660, .15); irA({set: b.dataset.abrir, i: -1, fase: "espera"}); });
+    document.getElementById("hInf").onclick = () => { verInforme = true; pintarHost(); };
+    document.getElementById("hBorrar").onclick = () => { confirmaBorrar = true; pintarHost(); };
+    if(confirmaBorrar){ document.getElementById("hNo").onclick = () => { confirmaBorrar = false; pintarHost(); };
+      document.getElementById("hSi").onclick = () => { confirmaBorrar = false; rtdb.ref("quiz").remove(); }; }
+    return;
+  }
+  const N = SETS[set].qs.length;
+  if(f === "espera"){
+    const k = "esp|" + set + "|" + nj; if(keyH === k) return; const nuevo = keyH.startsWith("esp|") && nj > 0; keyH = k;
+    const nombres = dataSet && dataSet.jug ? Object.values(dataSet.jug).sort((a, b) => (a.t || 0) - (b.t || 0)) : [];
+    const url = location.href.split("#")[0];
+    H.innerHTML = top() + `<div class="mid">${esc(SETS[set].nombre)} · ${N} preguntas</div>
+      <div class="lobby"><div style="display:grid;gap:10px;justify-items:center"><div class="qrbox" id="hQR"></div><div style="font-family:var(--mono);font-size:.9rem;word-break:break-all;max-width:300px;text-align:center">${esc(url)}</div><div class="muted">Entra y toca «🎮 Quiz en vivo»</div></div>
+      <div style="display:grid;gap:16px"><div class="cont" style="text-align:left"><b>${nj}</b>${nj === 1 ? "jugador conectado" : "jugadores conectados"}</div>
+      <div class="chips" style="justify-content:flex-start">${nombres.map(j => `<span>${esc(j.n)}</span>`).join("") || `<span class="pulso" style="background:none">Esperando jugadores…</span>`}</div>
+      <div class="fila"><button class="btnQ" type="button" id="hGo">Comenzar ▶</button><button class="btnQ sec" type="button" id="hCancel">Cancelar</button></div></div></div>`;
+    conSon();
+    if(window.QRCode) new QRCode(document.getElementById("hQR"), {text: url, width: 240, height: 240});
+    if(nuevo) tono(880, .08, "square", .06);
+    document.getElementById("hGo").onclick = siguiente;
+    document.getElementById("hCancel").onclick = () => rtdb.ref("quiz/estado").remove();
+    return;
+  }
+  const q = qDe(set, i);
+  if(f === "pregunta"){
+    const k = "preg|" + set + "|" + i; if(keyH === k) return; keyH = k;
+    H.innerHTML = top(`<span class="muted">Pregunta ${i + 1} de ${N}</span>`) + `
+      <div class="hq"><div class="reloj"><svg width="120" height="120" viewBox="0 0 120 120"><circle class="rb" cx="60" cy="60" r="52"/><circle class="rf" id="hRing" cx="60" cy="60" r="52"/></svg><b id="hSeg">${q.dur}</b></div>
+      <div class="mid" style="text-align:center">${esc(q.q)}</div>
+      <div class="cont"><b id="hCnt">0</b>de <span id="hTot">${nj}</span><br>respondieron</div></div>
+      <div class="ops">${q.op.map((o, kk) => `<div class="op op${kk}${q.code ? " code" : ""}"><span class="sh">${FIG[kk]}</span><span class="t">${esc(o)}</span></div>`).join("")}</div>
+      <div class="fila" style="justify-content:center"><button class="btnQ sec" type="button" id="hFin">Terminar ya ⏭</button></div>`;
+    conSon();
+    document.getElementById("hFin").onclick = () => { if(!cerrando){ cerrando = set + "|" + i; rtdb.ref("quiz/estado/fase").set("resultado"); } };
+    tickHost();
+    return;
+  }
+  if(f === "resultado"){
+    const k = "res|" + set + "|" + i; if(keyH === k) return; keyH = k;
+    const cnt = [0, 0, 0, 0], ri = dataSet && dataSet.resp && dataSet.resp[i] ? dataSet.resp[i] : {};
+    Object.values(ri).forEach(r => { if(r && cnt[r.r] !== undefined) cnt[r.r]++; });
+    const mx = Math.max(1, ...cnt), pct = nj ? Math.round(100 * cnt[q.ok] / nj) : 0;
+    const colores = ["#e11d48","#2563eb","#d97706","#16a34a"];
+    H.innerHTML = top(`<span class="muted">Pregunta ${i + 1} de ${N}</span>`) + `<div class="mid" style="text-align:center">${esc(q.q)}</div>
+      <div class="barras">${cnt.map((c, kk) => `<div class="barra" style="opacity:${kk === q.ok ? 1 : .45}"><b>${c}</b><i data-h="${Math.round(160 * c / mx) + 8}" style="background:${colores[kk]}"></i><span style="font-size:1.6rem">${FIG[kk]}${kk === q.ok ? " ✔" : ""}</span></div>`).join("")}</div>
+      <div class="cont"><b>${pct}%</b>acertó (${cnt[q.ok]} de ${nj})</div>
+      <div class="ops">${q.op.map((o, kk) => `<div class="op op${kk}${q.code ? " code" : ""} ${kk === q.ok ? "buena" : "apagada"}"><span class="sh">${kk === q.ok ? "✔" : FIG[kk]}</span><span class="t">${esc(o)}</span></div>`).join("")}</div>
+      <div class="fila" style="justify-content:center"><button class="btnQ" type="button" id="hRank">Ver ranking ▶</button></div>`;
+    conSon();
+    requestAnimationFrame(() => requestAnimationFrame(() => H.querySelectorAll(".barra i").forEach(x => x.style.height = x.dataset.h + "px")));
+    [523, 784].forEach((fq, kk) => setTimeout(() => tono(fq, .25, "triangle", .14), kk * 120));
+    document.getElementById("hRank").onclick = () => rtdb.ref("quiz/estado/fase").set("ranking");
+    return;
+  }
+  if(f === "ranking"){
+    const k = "rank|" + set + "|" + i; if(keyH === k) return; keyH = k;
+    const t = tabla(set, dataSet).slice(0, 5), ult = i + 1 >= N;
+    H.innerHTML = top(`<span class="muted">Pregunta ${i + 1} de ${N}</span>`) + `<div class="big" style="text-align:center">🏁 Ranking</div>
+      <ol class="rank">${t.map((x, kk) => `<li style="animation-delay:${kk * .12}s"><span>${kk + 1}. ${esc(x.n)}</span><span>${x.tot}</span></li>`).join("") || "<li>Nadie respondió todavía</li>"}</ol>
+      <div class="fila" style="justify-content:center"><button class="btnQ" type="button" id="hSig">${ult ? "Ver podio 🏆" : "Siguiente pregunta ▶"}</button></div>`;
+    conSon();
+    document.getElementById("hSig").onclick = siguiente;
+    return;
+  }
+  if(f === "podio"){
+    const k = "podio|" + set; if(keyH === k) return; keyH = k;
+    const t = tabla(set, dataSet), orden = [1, 0, 2], alto = [200, 280, 150], col = ["#94a3b8", "#facc15", "#d97706"];
+    H.innerHTML = top() + `<div class="big" style="text-align:center">🏆 Podio</div>
+      <div class="podio">${orden.map((p, kk) => t[p] ? `<div class="pcol"><div class="pn" style="animation-delay:${1 + kk * .3}s">${esc(t[p].n)}</div>
+        <div class="pb" style="height:${alto[kk]}px;background:${col[kk]};color:#1a0f4a;animation-delay:${kk * .3}s"><b>${p + 1}</b><span>${t[p].tot}</span></div></div>` : "").join("")}</div>
+      <div class="fila" style="justify-content:center"><button class="btnQ sec" type="button" id="hInf2">📊 Informe</button><button class="btnQ sec" type="button" id="hFinQ">Cerrar quiz</button></div>`;
+    conSon();
+    fanfarria(); setTimeout(confeti, 900);
+    document.getElementById("hInf2").onclick = () => { verInforme = true; pintarHost(); };
+    document.getElementById("hFinQ").onclick = () => rtdb.ref("quiz/estado").remove();
+  }
+}
+function tickHost(){
+  if(!rtdb || verInforme || !est || est.fase !== "pregunta" || !est.inicio) return;
+  const set = est.set, i = est.i, q = qDe(set, i), D = q.dur * 1000;
+  const rem = Math.max(0, D - (ahora() - est.inicio)), seg = Math.ceil(rem / 1000), nj = nJug(), nr = nResp(i);
+  const ring = document.getElementById("hRing"); if(ring) ring.style.strokeDashoffset = CIRC * (1 - rem / D);
+  const s = document.getElementById("hSeg"); if(s) s.textContent = seg;
+  const c = document.getElementById("hCnt"); if(c) c.textContent = nr;
+  const t = document.getElementById("hTot"); if(t) t.textContent = nj;
+  if(seg !== ultSeg){ ultSeg = seg; if(seg <= 5 && seg > 0) tono(seg <= 3 ? 1046 : 880, .07, "square", .07); }
+  const beat = Math.floor((D - rem) / 400); if(beat !== ultBeat && rem > 5000){ ultBeat = beat; tono(MELO[beat % MELO.length], .18, "triangle", .05); }
+  if((rem <= 0 || (nj > 0 && nr >= nj)) && cerrando !== set + "|" + i){ cerrando = set + "|" + i; rtdb.ref("quiz/estado/fase").set("resultado"); }
+}
+function pintarInforme(H, top){
+  H.innerHTML = top + `<div class="fb" style="max-width:1100px;justify-content:flex-start"><div class="big">📊 Informe</div><div class="giro"></div></div>`;
+  rtdb.ref("quiz/s").once("value").then(s => {
+    const d = s.val() || {}, A = d.antes ? tabla("antes", d.antes) : [], F = d.final ? tabla("final", d.final) : [];
+    const pct = (T, k) => { const n = T.length; return n ? Math.round(100 * T.filter(x => x.ac[k] === 1).length / n) : null; };
+    const norm = x => x.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ").trim();
+    const fila = (pa, pf, txt) => `<div><b>${esc(txt)}</b>
+      <span class="muted">Antes: ${pa === null ? "—" : pa + "%"}</span><div class="cbar"><i style="width:${pa || 0}%;background:#94a3b8"></i></div>
+      <span class="muted">Final: ${pf === null ? "—" : pf + "%"}</span><div class="cbar"><i style="width:${pf || 0}%;background:#facc15"></i></div>
+      ${pa !== null && pf !== null ? `<b style="font-size:1.4rem">${pf - pa >= 0 ? "▲ +" : "▼ "}${pf - pa} puntos</b>` : ""}</div>`;
+    const nombres = new Map(); A.forEach(x => nombres.set(norm(x.n), {n: x.n, a: x})); F.forEach(x => { const k = norm(x.n), o = nombres.get(k) || {n: x.n}; o.f = x; nombres.set(k, o); });
+    const filas = [...nombres.values()].sort((a, b) => a.n.localeCompare(b.n));
+    const cuenta = x => x ? x.ac.filter(v => v === 1).length : "—";
+    const csv = [["Nombre","Antes P1","Antes P2","Antes aciertos","Final P1","Final P2","Final P3","Final P4","Final P5","Final aciertos","Final puntos"]]
+      .concat(filas.map(r => [r.n, ...(r.a ? r.a.ac : ["",""]), r.a ? cuenta(r.a) : "", ...(r.f ? r.f.ac : ["","","","",""]), r.f ? cuenta(r.f) : "", r.f ? r.f.tot : ""].map(v => v === null ? "" : v)));
+    H.innerHTML = top + `<div class="fb" style="max-width:1100px;justify-content:flex-start;align-items:stretch;text-align:left">
+      <div class="fila" style="justify-content:space-between"><div class="big">📊 Informe</div><button class="btnQ sec" type="button" id="hVolver">← Volver</button></div>
+      <div class="inf"><div class="mid" style="font-size:1.3rem">Antes vs. final (mismas preguntas, % de jugadores que acertó)</div>
+        <div class="comp">${fila(pct(A, 0), pct(F, 0), "P1 · Con qué columna se une (FK = PK)")}${fila(pct(A, 1), pct(F, 1), "P2 · LEFT JOIN + IS NULL")}</div>
+        <p class="muted">Jugadores: antes ${A.length} · final ${F.length}. Quien no respondió cuenta como incorrecto.</p></div>
+      <div class="inf"><div class="mid" style="font-size:1.3rem">Quiz final por pregunta</div>
+        <div class="comp">${SETS.final.qs.map((qi, k) => `<div><b>P${k + 1}</b><span class="muted">${esc(PREG[qi].q)}</span><div class="cbar"><i style="width:${pct(F, k) || 0}%;background:#22c55e"></i></div><b>${pct(F, k) === null ? "—" : pct(F, k) + "%"}</b></div>`).join("")}</div></div>
+      <div class="inf"><div class="fila" style="justify-content:space-between"><div class="mid" style="font-size:1.3rem">Por estudiante</div><button class="btnQ" type="button" id="hCsv">⬇ Descargar CSV</button></div>
+        <div class="tabla"><table><thead><tr><th>Nombre</th><th>Antes (de 2)</th><th>Final (de 5)</th><th>Puntos final</th></tr></thead>
+        <tbody>${filas.map(r => `<tr><td>${esc(r.n)}</td><td>${cuenta(r.a)}</td><td>${cuenta(r.f)}</td><td>${r.f ? r.f.tot : "—"}</td></tr>`).join("") || `<tr><td colspan="4">Sin datos todavía</td></tr>`}</tbody></table></div>
+        <p class="muted">Las dos rondas se emparejan por nombre: pide que escriban el mismo nombre en las dos.</p></div></div>`;
+    document.getElementById("hVolver").onclick = () => { verInforme = false; keyH = ""; pintarHost(); };
+    document.getElementById("hCsv").onclick = () => {
+      const txt = "﻿" + csv.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(";")).join("\r\n");
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], {type: "text/csv;charset=utf-8"}));
+      a.download = "quiz_join_resultados.csv"; document.body.appendChild(a); a.click(); a.remove();
+    };
+  });
+}
 
 /* Arranque */
 const ultimo = recuperar("mt_lista"); if(ultimo) numLista.value = ultimo;
