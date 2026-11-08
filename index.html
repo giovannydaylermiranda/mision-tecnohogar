@@ -210,8 +210,9 @@ th{background:var(--bg)}
     <a class="volver" href="#inicio">← Volver</a>
     <div class="panel" id="pedirTarjeta">
       <h2>🎴 Tu tarjeta para el JOIN humano</h2>
-      <label for="numLista">Tu número de lista (1 a 35)</label>
+      <label for="numLista">Tu número de tarjeta (te lo dice el docente)</label>
       <input id="numLista" type="number" min="1" max="35" inputmode="numeric" placeholder="Ej.: 7">
+      <p id="infoN" class="muted"></p>
       <button class="btn" id="btnTarjeta" type="button">Ver mi tarjeta</button>
       <p id="errTarjeta" class="muted" role="alert"></p>
     </div>
@@ -291,17 +292,22 @@ th{background:var(--bg)}
 
     <div class="panel" id="t-join" hidden>
       <h2>JOIN humano</h2>
+      <p class="muted">1) Cuenta a los presentes por filas: «tú eres el 1, tú el 2…». 2) Escribe cuántos son y toca <b>Repartir</b>. Las tarjetas de los celulares se ajustan solas.</p>
+      <div class="fila"><label for="nLlegaron">¿Cuántos llegaron?</label>
+        <input id="nLlegaron" type="number" min="6" max="35" inputmode="numeric" style="max-width:130px">
+        <button class="btn" type="button" id="btnN">Repartir</button></div>
+      <p id="msgN" class="muted" role="status"></p>
       <div class="cifras">
-        <div class="cifra"><span class="muted">Tarjetas de cliente</span><b>14</b></div>
-        <div class="cifra"><span class="muted">Tarjetas de pedido</span><b>21</b></div>
-        <div class="cifra"><span class="muted">INNER JOIN (filas)</span><b>21</b></div>
-        <div class="cifra"><span class="muted">LEFT JOIN (filas)</span><b>27</b></div>
+        <div class="cifra"><span class="muted">Tarjetas de cliente</span><b id="cC">—</b></div>
+        <div class="cifra"><span class="muted">Tarjetas de pedido</span><b id="cP">—</b></div>
+        <div class="cifra"><span class="muted">INNER JOIN (filas)</span><b id="cI">—</b></div>
+        <div class="cifra"><span class="muted">LEFT JOIN (filas)</span><b id="cL">—</b></div>
       </div>
       <h2>Clientes que se declararon NULL <span id="cuentaNull" class="chip n">0</span></h2>
       <div class="lista" id="listaNull"><p class="muted">Todavía nadie. En la ronda LEFT, los clientes sin pedido tocan «Soy NULL».</p></div>
       <div class="fila"><button class="btn sec" type="button" id="verRespuesta">Mostrar respuesta</button></div>
-      <div id="respuesta" class="aviso" hidden>Los 6 clientes sin pedidos (los «perdidos» del misterio): <b>12</b> Patricia Cruz, <b>27</b> Carmen Soliz, <b>38</b> Pedro Aguilar, <b>49</b> Pedro Rocha, <b>55</b> Miguel Sánchez y <b>60</b> Fernando Ibáñez. Son reales: en la base nunca hicieron un pedido.</div>
-      <div class="fila"><button class="btn sec" type="button" data-reset="join">Reiniciar JOIN</button></div>
+      <div id="respuesta" class="aviso" hidden></div>
+      <div class="fila"><button class="btn sec" type="button" data-reset="join/null">Borrar los «Soy NULL»</button></div>
     </div>
 
     <div class="panel" id="t-boletos" hidden>
@@ -312,8 +318,8 @@ th{background:var(--bg)}
     </div>
 
     <div class="panel" id="t-tarjetas" hidden>
-      <h2>Tarjetas por número de lista</h2>
-      <p class="muted">Respaldo sin internet: proyecta esta tabla y que cada uno copie su tarjeta en una hoja.</p>
+      <h2>Tarjetas de hoy <span id="tituloN" class="chip c">35</span></h2>
+      <p class="muted">Se ajusta a «¿Cuántos llegaron?» (pestaña JOIN humano). Respaldo sin internet: proyecta esta tabla y que cada uno copie su tarjeta en una hoja.</p>
       <div class="tabla"><table><thead><tr><th>N.º</th><th>Tipo</th><th>Clave</th><th>Datos</th></tr></thead><tbody id="tablaTarjetas"></tbody></table></div>
     </div>
 
@@ -352,7 +358,7 @@ const FIREBASE_CONFIG = {
 
 /* =====================================================================
    2) TARJETAS (datos reales de TecnoHogar)
-   14 clientes (6 sin pedidos) y 21 pedidos de 8 clientes.
+   14 clientes (6 sin pedidos) y 21 pedidos de 8 clientes. Se reparten según cuántos llegaron (asignacion).
    INNER JOIN = 21 filas · LEFT JOIN = 21 + 6 NULL = 27 filas.
    ===================================================================== */
 const CLIENTES = {12:"Patricia Cruz Sánchez",27:"Carmen Soliz Salinas",38:"Pedro Aguilar Claure",49:"Pedro Rocha Rojas",55:"Miguel Sánchez Montaño",
@@ -363,13 +369,48 @@ const PEDIDOS = [[114,31,"2025-12-16","virtual"],[547,31,"2026-08-02","virtual"]
   [84,11,"2025-12-23","virtual"],[153,11,"2026-01-27","virtual"],[301,26,"2026-04-03","físico"],[419,26,"2026-06-07","virtual"],[268,33,"2026-03-22","físico"],
   [393,33,"2026-05-14","físico"],[432,33,"2026-06-26","físico"],[58,46,"2025-11-06","físico"],[63,46,"2025-12-13","físico"],[451,46,"2026-06-11","físico"],
   [49,58,"2025-11-02","virtual"],[182,58,"2026-01-24","físico"]];
-// Orden fijo de reparto por número de lista: clientes y pedidos mezclados, sin parejas seguidas.
-const ORDEN = ["C12","P114","P22","C31","P125","C2","P547","C27","P84","C54","P301","C11","P167","P268","C38","P23","C26","P58","P603","C49",
-  "P153","C33","P518","P393","C55","P285","C46","P419","P49","C60","P432","C58","P63","P182","P451"];
+// Reparto según cuántos llegaron (N): siempre clientes junto con sus pedidos, nunca un pedido sin su cliente.
+const PERDIDOS = [12,27,38,49,55,60];
+const GRUPOS = [[31,[114,547,603]],[54,[125,167,518]],[11,[84,153]],[26,[301,419]],[2,[22,23,285]],[33,[268,393,432]],[46,[58,63,451]],[58,[49,182]]];
+let HOY_N = 35;
+function asignacion(N){
+  N = Math.max(1, Math.min(35, N|0));
+  let nNull = N >= 35 ? 6 : Math.min(6, Math.max(1, Math.ceil(N * 0.3)));
+  let r = N - nNull; if(r === 1){ nNull = Math.max(0, nNull - 1); r = 2; }
+  // busca grupos completos (+ como máximo uno parcial con al menos 1 pedido) que sumen r
+  let mejor = null;
+  for(let m = 0; m < 256; m++){
+    let tam = 0, score = 0;
+    for(let g = 0; g < 8; g++) if(m >> g & 1){ tam += 1 + GRUPOS[g][1].length; score += 10 - g; }
+    if(tam === r){ const c = {m, parcial:null, score: score + 1000}; if(!mejor || c.score > mejor.score) mejor = c; }
+    else if(tam < r){
+      const falta = r - tam;
+      for(let g = 0; g < 8; g++) if(!(m >> g & 1) && falta >= 2 && falta - 1 < GRUPOS[g][1].length){
+        const c = {m, parcial:[g, falta - 1], score}; if(!mejor || c.score > mejor.score) mejor = c;
+      }
+    }
+  }
+  const cartas = PERDIDOS.slice(0, nNull).map(id => "C" + id);
+  if(mejor){
+    for(let g = 0; g < 8; g++) if(mejor.m >> g & 1){ cartas.push("C" + GRUPOS[g][0]); GRUPOS[g][1].forEach(p => cartas.push("P" + p)); }
+    if(mejor.parcial){ const [g, k] = mejor.parcial; cartas.push("C" + GRUPOS[g][0]); GRUPOS[g][1].slice(0, k).forEach(p => cartas.push("P" + p)); }
+  }
+  // mezcla fija según N (todos los celulares calculan lo mismo)
+  let seed = N * 2654435761 >>> 0; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+  for(let i = cartas.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [cartas[i], cartas[j]] = [cartas[j], cartas[i]]; }
+  return cartas;
+}
+let ORDEN = asignacion(35);
+function resumenN(){
+  const c = ORDEN.filter(k => k[0] === "C").map(k => Number(k.slice(1))), p = ORDEN.filter(k => k[0] === "P").length;
+  const conPedido = new Set(ORDEN.filter(k => k[0] === "P").map(k => PEDIDOS.find(x => x[0] === Number(k.slice(1)))[1]));
+  const solos = c.filter(id => !conPedido.has(id));
+  return {clientes: c.length, pedidos: p, inner: p, left: p + solos.length, solos};
+}
 function tarjetaDe(n){
   const k = ORDEN[n-1]; if(!k) return null;
   const id = Number(k.slice(1));
-  if(k[0]==="C") return {tipo:"cliente", id, nombre:CLIENTES[id], sinPedido:[12,27,38,49,55,60].includes(id)};
+  if(k[0]==="C") return {tipo:"cliente", id, nombre:CLIENTES[id], sinPedido:PERDIDOS.includes(id)};
   const p = PEDIDOS.find(x=>x[0]===id);
   return {tipo:"pedido", id, fk:p[1], fecha:p[2], canal:p[3]};
 }
@@ -416,15 +457,31 @@ window.addEventListener("hashchange", mostrar);
 const numLista = document.getElementById("numLista");
 document.getElementById("btnTarjeta").addEventListener("click", verTarjeta);
 numLista.addEventListener("keydown", e=>{ if(e.key==="Enter") verTarjeta(); });
+let nListo = !rtdb, tarjetaVista = 0;
+function fijarN(N){
+  HOY_N = N; ORDEN = asignacion(N); numLista.max = N;
+  document.getElementById("infoN").textContent = nListo ? "Hoy hay tarjetas del 1 al " + N + "." : "";
+  if(tarjetaVista && !document.getElementById("miTarjeta").hidden){
+    if(tarjetaVista <= N) pintarTarjeta(tarjetaVista, recuperar("mt_null_" + N + "_" + tarjetaVista) === true);
+    else { document.getElementById("miTarjeta").hidden = true; document.getElementById("pedirTarjeta").hidden = false; }
+  }
+  if(typeof pintarDocenteN === "function") pintarDocenteN();
+}
+if(rtdb){
+  document.getElementById("infoN").textContent = "Esperando que el docente indique cuántos llegaron…";
+  rtdb.ref("join/n").on("value", s => { const v = s.val(); if(v >= 1 && v <= 35){ nListo = true; fijarN(v); } else { nListo = false; HOY_N = 35; ORDEN = asignacion(35); document.getElementById("infoN").textContent = "Esperando que el docente indique cuántos llegaron…"; if(typeof pintarDocenteN === "function") pintarDocenteN(); } });
+}
 function verTarjeta(){
   const n = parseInt(numLista.value, 10);
   const err = document.getElementById("errTarjeta");
-  if(!(n>=1 && n<=35)){ err.textContent = "Escribe un número entre 1 y 35."; return; }
+  if(!nListo){ err.textContent = "Todavía no se repartieron las tarjetas. Espera la indicación del docente."; return; }
+  if(!(n>=1 && n<=HOY_N)){ err.textContent = "Escribe un número entre 1 y " + HOY_N + "."; return; }
   err.textContent = "";
   recordar("mt_lista", n);
-  pintarTarjeta(n, recuperar("mt_null_"+n) === true);
+  pintarTarjeta(n, recuperar("mt_null_" + HOY_N + "_" + n) === true);
 }
 function pintarTarjeta(n, esNull){
+  tarjetaVista = n;
   const t = tarjetaDe(n), box = document.getElementById("miTarjeta");
   document.getElementById("pedirTarjeta").hidden = true; box.hidden = false; box.replaceChildren();
   const card = document.createElement("div");
@@ -443,8 +500,8 @@ function pintarTarjeta(n, esNull){
     const b = document.createElement("button"); b.type="button"; b.className = esNull ? "btn sec" : "btn peligro";
     b.textContent = esNull ? "Me equivoqué: sí tengo pedido" : "Ronda LEFT: no tengo pedido → soy NULL";
     b.addEventListener("click", ()=>{
-      const nuevo = !esNull; recordar("mt_null_"+n, nuevo);
-      guardar("join/"+n, nuevo ? {id:t.id, nombre:t.nombre, t:Date.now()} : null);
+      const nuevo = !esNull; recordar("mt_null_" + HOY_N + "_" + n, nuevo);
+      guardar("join/null/"+n, nuevo ? {id:t.id, nombre:t.nombre, t:Date.now()} : null);
       pintarTarjeta(n, nuevo);
     });
     card.appendChild(b);
@@ -462,7 +519,7 @@ function pintarTarjeta(n, esNull){
     ins.textContent = "Busca al cliente cuyo id_cliente (PK) sea " + t.fk + ". Esa es tu pareja: ON p.id_cliente = c.id_cliente.";
     card.appendChild(ins);
   }
-  const otro = document.createElement("button"); otro.type="button"; otro.className="btn sec"; otro.textContent="Cambiar número de lista";
+  const otro = document.createElement("button"); otro.type="button"; otro.className="btn sec"; otro.textContent="Cambiar número de tarjeta";
   otro.addEventListener("click", ()=>{ box.hidden = true; document.getElementById("pedirTarjeta").hidden = false; numLista.focus(); });
   box.append(card, otro);
 }
@@ -531,14 +588,15 @@ function iniciarDocente(){
     }
   }
   pintarTablero(null);
-  // Tabla de tarjetas
-  const tb = document.getElementById("tablaTarjetas");
-  for(let n=1; n<=35; n++){
-    const t = tarjetaDe(n), tr = document.createElement("tr");
-    const datos = t.tipo==="cliente" ? t.nombre : "FK id_cliente → " + t.fk + " · " + t.fecha;
-    tr.innerHTML = `<td>${n}</td><td><span class="chip ${t.tipo==="cliente"?"c":"p"}">${t.tipo}</span></td><td style="font-family:var(--mono)">${t.id}</td><td></td>`;
-    tr.lastChild.textContent = datos; tb.appendChild(tr);
-  }
+  // Reparto según asistencia
+  const inN = document.getElementById("nLlegaron"); inN.value = HOY_N;
+  document.getElementById("btnN").addEventListener("click", ()=>{
+    const v = parseInt(inN.value, 10), msg = document.getElementById("msgN");
+    if(!(v >= 6 && v <= 35)){ msg.textContent = "Escribe un número entre 6 y 35."; return; }
+    if(rtdb){ rtdb.ref("join/n").set(v); rtdb.ref("join/null").remove(); msg.textContent = "Listo: tarjetas del 1 al " + v + ". Los celulares ya se actualizaron."; }
+    else { nListo = true; fijarN(v); msg.textContent = "Sin conexión: proyecta la pestaña 📋 Tarjetas."; }
+  });
+  pintarDocenteN();
   // QR
   const url = location.href.split("#")[0];
   document.getElementById("urlPagina").textContent = url;
@@ -552,14 +610,14 @@ function iniciarDocente(){
     document.getElementById("sinVivo1").hidden = true;
     rtdb.ref("semaforo").on("value", s => pintarTablero(s.val()));
     setInterval(()=> rtdb.ref("semaforo").once("value").then(s=>pintarTablero(s.val())), 30000);
-    rtdb.ref("join").on("value", s=>{
+    rtdb.ref("join/null").on("value", s=>{
       const v = s.val() || {}, lista = document.getElementById("listaNull"), ks = Object.keys(v);
       document.getElementById("cuentaNull").textContent = ks.length;
       lista.replaceChildren();
       if(!ks.length){ const p=document.createElement("p"); p.className="muted"; p.textContent="Todavía nadie."; lista.appendChild(p); return; }
       ks.sort((a,b)=>v[a].id-v[b].id).forEach(k=>{
         const d = document.createElement("div"); d.className="boleto";
-        d.textContent = "id_cliente " + v[k].id + " · " + v[k].nombre + " (lista " + k + ")";
+        d.textContent = "id_cliente " + v[k].id + " · " + v[k].nombre + " (tarjeta " + k + ")";
         lista.appendChild(d);
       });
     });
@@ -591,7 +649,7 @@ function iniciarDocente(){
   // Reinicios con confirmación en la página
   let rutaBorrar = null;
   const conf = document.getElementById("confirmar");
-  const NOMBRES = {semaforo:"el tablero del semáforo", join:"los NULL del JOIN humano", boletos:"todos los boletos de salida"};
+  const NOMBRES = {semaforo:"el tablero del semáforo", "join/null":"los «Soy NULL» del JOIN humano", boletos:"todos los boletos de salida"};
   document.querySelectorAll("[data-reset]").forEach(b => b.addEventListener("click", ()=>{
     if(!rtdb){ return; }
     rutaBorrar = b.dataset.reset;
@@ -609,6 +667,26 @@ function onCorrecto(txt){
   let x = String(txt).toLowerCase().replace(/[\[\];\s]/g, "").replace(/^on/, "");
   x = x.replace(/pedidos\./g, "p.").replace(/sucursales\./g, "s.");
   return x === "p.id_sucursal=s.id_sucursal" || x === "s.id_sucursal=p.id_sucursal";
+}
+function pintarDocenteN(){
+  const tb = document.getElementById("tablaTarjetas"); if(!tb) return;
+  const R = resumenN();
+  document.getElementById("cC").textContent = R.clientes; document.getElementById("cP").textContent = R.pedidos;
+  document.getElementById("cI").textContent = R.inner; document.getElementById("cL").textContent = R.left;
+  document.getElementById("tituloN").textContent = "1 a " + HOY_N;
+  const inN = document.getElementById("nLlegaron"); if(inN && document.activeElement !== inN) inN.value = HOY_N;
+  const num = id => ORDEN.indexOf("C" + id) + 1;
+  const resp = document.getElementById("respuesta");
+  resp.innerHTML = "Hoy los clientes sin pedidos (los «perdidos») son <b>" + R.solos.length + "</b>: " +
+    R.solos.map(id => "<b>" + id + "</b> " + CLIENTES[id] + " (tarjeta " + num(id) + ")").join(", ") +
+    ". INNER JOIN = <b>" + R.inner + "</b> filas · LEFT JOIN = <b>" + R.left + "</b> filas (" + R.inner + " + " + R.solos.length + " con NULL).";
+  tb.replaceChildren();
+  for(let n=1; n<=HOY_N; n++){
+    const t = tarjetaDe(n), tr = document.createElement("tr");
+    const datos = t.tipo==="cliente" ? t.nombre + (R.solos.includes(t.id) ? " · sin pedido (NULL)" : "") : "FK id_cliente → " + t.fk + " · " + t.fecha;
+    tr.innerHTML = `<td>${n}</td><td><span class="chip ${t.tipo==="cliente"?"c":"p"}">${t.tipo}</span></td><td style="font-family:var(--mono)">${t.id}</td><td></td>`;
+    tr.lastChild.textContent = datos; tb.appendChild(tr);
+  }
 }
 function hace(t){ const s = Math.max(0, Math.round((Date.now()-t)/1000)); return s < 60 ? "hace " + s + " s" : "hace " + Math.round(s/60) + " min"; }
 
