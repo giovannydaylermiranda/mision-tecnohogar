@@ -246,8 +246,8 @@ th{background:var(--bg)}
     <form class="panel" id="formBoleto">
       <h2>🎟️ Boleto de salida</h2>
       <div id="boletoSinConexion" class="aviso" hidden>Esta página no está conectada. Escribe tu boleto en el <b>foro de Moodle</b> de la clase.</div>
-      <label for="bNombre">Tu nombre (opcional)</label>
-      <input id="bNombre" type="text" maxlength="60" autocomplete="name">
+      <label for="bNombre">Tu nombre y apellido</label>
+      <input id="bNombre" type="text" maxlength="60" autocomplete="name" required>
       <label for="bEntendi">Hoy entendí…</label>
       <textarea id="bEntendi" maxlength="400" required></textarea>
       <label for="bCuesta">Todavía me cuesta…</label>
@@ -314,7 +314,7 @@ th{background:var(--bg)}
       <h2>Boletos de salida <span id="cuentaBoletos" class="chip c">0</span></h2>
       <div class="cifra"><span class="muted">ON correcto (p.id_sucursal = s.id_sucursal)</span><b id="resumenOn">—</b></div>
       <div class="lista" id="listaBoletos"><p class="muted">Aún no llegan boletos.</p></div>
-      <div class="fila"><button class="btn sec" type="button" data-reset="boletos">Borrar boletos</button></div>
+      <div class="fila"><button class="btn" type="button" id="csvBoletos">⬇ Descargar boletos (Excel)</button><button class="btn sec" type="button" data-reset="boletos">Borrar boletos</button></div>
     </div>
 
     <div class="panel" id="t-tarjetas" hidden>
@@ -558,7 +558,7 @@ document.getElementById("formBoleto").addEventListener("submit", e=>{
               entendi: document.getElementById("bEntendi").value.trim().slice(0,400),
               cuesta: document.getElementById("bCuesta").value.trim().slice(0,400),
               on: document.getElementById("bOn").value.trim().slice(0,120), t: Date.now() };
-  if(!d.entendi || !d.cuesta || !d.on){ msg.textContent = "Completa los tres campos."; return; }
+  if(d.nombre.length < 3 || !d.entendi || !d.cuesta || !d.on){ msg.textContent = "Completa todos los campos, también tu nombre."; return; }
   document.getElementById("btnBoleto").disabled = true; msg.textContent = "Enviando…";
   rtdb.ref("boletos").push(d).then(()=>{ msg.textContent = "¡Listo! Tu boleto llegó. Gracias."; e.target.reset(); })
     .catch(()=>{ msg.textContent = "No se pudo enviar. Intenta otra vez."; })
@@ -646,6 +646,19 @@ function iniciarDocente(){
       });
     });
   }
+  // Descargar boletos en CSV (se abre en Excel)
+  document.getElementById("csvBoletos").addEventListener("click", ()=>{
+    if(!rtdb) return;
+    rtdb.ref("boletos").once("value").then(s=>{
+      const v = s.val() || {}, filas = Object.keys(v).map(k=>v[k]).sort((a,b)=>(a.nombre||"").localeCompare(b.nombre||""));
+      const f = t => new Date(t).toLocaleString("es-BO");
+      const data = [["Nombre","Hoy entendí","Todavía me cuesta","ON escrito","ON correcto","Hora"]]
+        .concat(filas.map(b=>[b.nombre||"", b.entendi||"", b.cuesta||"", b.on||"", b.on ? (onCorrecto(b.on) ? "Sí" : "No") : "", b.t ? f(b.t) : ""]));
+      const txt = "\ufeff" + data.map(r=>r.map(x=>'"' + String(x).replace(/"/g,'""') + '"').join(";")).join("\r\n");
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], {type:"text/csv;charset=utf-8"}));
+      a.download = "boletos_salida.csv"; document.body.appendChild(a); a.click(); a.remove();
+    });
+  });
   // Reinicios con confirmación en la página
   let rutaBorrar = null;
   const conf = document.getElementById("confirmar");
