@@ -69,7 +69,7 @@ textarea{min-height:90px; resize:vertical}
 #miTarjeta{display:flex; flex-direction:column; gap:14px}
 .nullsello{font-family:var(--mono); font-size:3rem; font-weight:700; color:#fff; text-align:center}
 /* Semáforo */
-.grupos{display:grid; grid-template-columns:repeat(auto-fit,minmax(70px,1fr)); gap:10px}
+.grupos{display:grid; grid-template-columns:repeat(5,1fr); gap:10px}
 .grupos button{font:inherit; font-family:var(--display); font-weight:800; font-size:1.5rem; padding:18px 0; border-radius:12px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer}
 .grupos button[aria-pressed=true]{background:var(--ink); color:var(--surface); border-color:var(--ink)}
 .luces{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
@@ -85,7 +85,8 @@ textarea{min-height:90px; resize:vertical}
 .tabs{display:flex; gap:8px; flex-wrap:wrap}
 .tabs button{font:inherit; font-weight:700; padding:10px 14px; border-radius:10px; border:2px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer}
 .tabs button[aria-selected=true]{background:var(--ink); color:var(--surface); border-color:var(--ink)}
-.tablero{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px}
+.tablero{display:grid; grid-template-columns:repeat(5,1fr); gap:12px}
+@media (max-width:600px){ .tablero{grid-template-columns:repeat(2,1fr)} }
 .mesa{border-radius:16px; padding:18px 12px; text-align:center; color:#fff; background:#64748b; display:flex; flex-direction:column; gap:4px}
 .mesa.verde{background:var(--verde)} .mesa.amarillo{background:var(--amarillo); color:#1a1a1a} .mesa.rojo{background:var(--rojo)}
 .mesa b{font-family:var(--display); font-size:2.2rem; line-height:1}
@@ -470,7 +471,7 @@ function pintarTarjeta(n, esNull){
 const MSG = {verde:"Avanzamos", amarillo:"Tenemos una duda", rojo:"Estamos trabados"};
 let grupoSel = recuperar("mt_grupo");
 const gruposEl = document.getElementById("grupos");
-for(let g=1; g<=7; g++){
+for(let g=1; g<=10; g++){
   const b = document.createElement("button"); b.type="button"; b.textContent = g; b.setAttribute("aria-pressed", String(g===grupoSel));
   b.setAttribute("aria-label","Grupo "+g);
   b.addEventListener("click", ()=>{ grupoSel = g; recordar("mt_grupo", g);
@@ -520,7 +521,7 @@ function iniciarDocente(){
   const tablero = document.getElementById("tablero");
   function pintarTablero(datos){
     tablero.replaceChildren();
-    for(let g=1; g<=7; g++){
+    for(let g=1; g<=10; g++){
       const d = datos && datos["g"+g];
       const m = document.createElement("div"); m.className = "mesa" + (d ? " "+d.c : "");
       const b = document.createElement("b"); b.textContent = g;
@@ -776,8 +777,9 @@ function siguiente(){
 }
 function pintarHost(){
   const H = document.getElementById("arenaH");
-  const top = (extra = "") => `<div class="atop"><a href="#docente">← Vista docente</a><span style="display:flex;gap:10px;align-items:center">${extra}<button class="btnQ sec" type="button" id="hSon" style="font-size:.9rem;padding:8px 12px">${sonido ? "🔊" : "🔇"}</button></span></div>`;
-  const conSon = () => { const b = document.getElementById("hSon"); if(b) b.onclick = () => { sonido = !sonido; recordar("mt_sonido", sonido); b.textContent = sonido ? "🔊" : "🔇"; }; };
+  const top = (extra = "") => `<div class="atop"><a href="#docente">← Vista docente</a><span style="display:flex;gap:10px;align-items:center">${extra}<button class="btnQ sec" type="button" id="hSon" style="font-size:.9rem;padding:8px 12px">${sonido ? "🔊" : "🔇"}</button>${est && est.set && !verInforme ? `<button class="btnQ sec" type="button" id="hCerrar" style="font-size:.9rem;padding:8px 12px">✖ Cerrar quiz</button>` : ""}</span></div>`;
+  const conSon = () => { const b = document.getElementById("hSon"); if(b) b.onclick = () => { sonido = !sonido; recordar("mt_sonido", sonido); b.textContent = sonido ? "🔊" : "🔇"; };
+    const c = document.getElementById("hCerrar"); if(c) c.onclick = () => rtdb.ref("quiz/estado").remove(); };
   if(!rtdb){ if(keyH !== "off"){ keyH = "off"; H.innerHTML = top() + `<div class="fb"><div class="logoQ">Quiz <span>JOIN</span></div><p>Falta la configuración de Firebase.</p></div>`; conSon(); } return; }
   if(verInforme){ if(keyH !== "inf"){ keyH = "inf"; pintarInforme(H, top()); conSon(); } return; }
   const f = est && est.set ? est.fase : "nada", set = est && est.set, i = est ? est.i : -1, nj = nJug();
