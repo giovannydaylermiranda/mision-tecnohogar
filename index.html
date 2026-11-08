@@ -174,6 +174,8 @@ th{background:var(--bg)}
       <textarea id="bEntendi" maxlength="400" required></textarea>
       <label for="bCuesta">Todavía me cuesta…</label>
       <textarea id="bCuesta" maxlength="400" required></textarea>
+      <label for="bOn">Escribe el ON para unir <code>pedidos p</code> con <code>sucursales s</code></label>
+      <input id="bOn" type="text" maxlength="120" required autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ON ..." style="font-family:var(--mono)">
       <button class="btn" type="submit" id="btnBoleto">Enviar boleto</button>
       <p id="msgBoleto" role="status"></p>
     </form>
@@ -215,6 +217,7 @@ th{background:var(--bg)}
 
     <div class="panel" id="t-boletos" hidden>
       <h2>Boletos de salida <span id="cuentaBoletos" class="chip c">0</span></h2>
+      <div class="cifra"><span class="muted">ON correcto (p.id_sucursal = s.id_sucursal)</span><b id="resumenOn">—</b></div>
       <div class="lista" id="listaBoletos"><p class="muted">Aún no llegan boletos.</p></div>
       <div class="fila"><button class="btn sec" type="button" data-reset="boletos">Borrar boletos</button></div>
     </div>
@@ -403,8 +406,9 @@ document.getElementById("formBoleto").addEventListener("submit", e=>{
   if(!rtdb){ msg.textContent = "Sin conexión: usa el foro de Moodle."; return; }
   const d = { nombre: document.getElementById("bNombre").value.trim().slice(0,60),
               entendi: document.getElementById("bEntendi").value.trim().slice(0,400),
-              cuesta: document.getElementById("bCuesta").value.trim().slice(0,400), t: Date.now() };
-  if(!d.entendi || !d.cuesta){ msg.textContent = "Completa las dos frases."; return; }
+              cuesta: document.getElementById("bCuesta").value.trim().slice(0,400),
+              on: document.getElementById("bOn").value.trim().slice(0,120), t: Date.now() };
+  if(!d.entendi || !d.cuesta || !d.on){ msg.textContent = "Completa los tres campos."; return; }
   document.getElementById("btnBoleto").disabled = true; msg.textContent = "Enviando…";
   rtdb.ref("boletos").push(d).then(()=>{ msg.textContent = "¡Listo! Tu boleto llegó. Gracias."; e.target.reset(); })
     .catch(()=>{ msg.textContent = "No se pudo enviar. Intenta otra vez."; })
@@ -469,6 +473,8 @@ function iniciarDocente(){
     rtdb.ref("boletos").on("value", s=>{
       const v = s.val() || {}, ks = Object.keys(v).sort((a,b)=>v[b].t-v[a].t), lista = document.getElementById("listaBoletos");
       document.getElementById("cuentaBoletos").textContent = ks.length;
+      const conOn = ks.filter(k => v[k].on), buenos = conOn.filter(k => onCorrecto(v[k].on)).length;
+      document.getElementById("resumenOn").textContent = conOn.length ? buenos + " de " + conOn.length + " (" + Math.round(100*buenos/conOn.length) + "%)" : "—";
       lista.replaceChildren();
       if(!ks.length){ const p=document.createElement("p"); p.className="muted"; p.textContent="Aún no llegan boletos."; lista.appendChild(p); return; }
       ks.forEach(k=>{
@@ -478,7 +484,14 @@ function iniciarDocente(){
         const a1 = document.createElement("span"); a1.textContent = b.entendi;
         const q2 = document.createElement("span"); q2.className="q"; q2.textContent="Todavía me cuesta";
         const a2 = document.createElement("span"); a2.textContent = b.cuesta;
-        d.append(n,q1,a1,q2,a2); lista.appendChild(d);
+        d.append(n,q1,a1,q2,a2);
+        if(b.on){
+          const q3 = document.createElement("span"); q3.className="q"; q3.textContent="ON escrito";
+          const a3 = document.createElement("span"); a3.style.fontFamily="var(--mono)";
+          a3.textContent = (onCorrecto(b.on) ? "✅ " : "❌ ") + b.on;
+          d.append(q3,a3);
+        }
+        lista.appendChild(d);
       });
     });
   }
@@ -497,6 +510,12 @@ function iniciarDocente(){
     if(rtdb && rutaBorrar) rtdb.ref(rutaBorrar).remove();
     conf.hidden = true; rutaBorrar = null;
   });
+}
+/* Acepta p.id_sucursal = s.id_sucursal en cualquier orden, con o sin "ON", con nombres de tabla completos o con corchetes */
+function onCorrecto(txt){
+  let x = String(txt).toLowerCase().replace(/[\[\];\s]/g, "").replace(/^on/, "");
+  x = x.replace(/pedidos\./g, "p.").replace(/sucursales\./g, "s.");
+  return x === "p.id_sucursal=s.id_sucursal" || x === "s.id_sucursal=p.id_sucursal";
 }
 function hace(t){ const s = Math.max(0, Math.round((Date.now()-t)/1000)); return s < 60 ? "hace " + s + " s" : "hace " + Math.round(s/60) + " min"; }
 
